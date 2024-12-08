@@ -10,28 +10,31 @@ import {
   FIELD_MAPPING,
   CUSTOM_TYPE_ORDER,
   COLLECTION_NAME,
+  ITEM_STALE_TIME,
+  ITEM_CACHE_ITEM,
   getRarityColor,
 } from "../constants/appConfig";
+
+const formatPrice = (price) => {
+  if (!price || isNaN(price)) return "N/A"; // Handle invalid or missing prices
+  return price.toLocaleString("en-US"); // Format number with commas
+};
 
 const fetchCategories = async () => {
   const snapshot = await getDocs(collection(db, COLLECTION_NAME));
   const types = new Set(
     snapshot.docs.map((doc) => {
       const type = doc.data().Type || "Miscellaneous";
-      return type === "Misc" ? "Miscellaneous" : type; // Map "Misc" to "Miscellaneous"
+      return type === "Misc" ? "Miscellaneous" : type;
     })
   );
 
-  // Add missing categories explicitly
-  if (!types.has("Ranged Weapon")) {
-    types.add("Ranged Weapon");
-  }
+  if (!types.has("Ranged Weapon")) types.add("Ranged Weapon");
+  if (!types.has("Miscellaneous")) types.add("Miscellaneous");
 
-  // Sort by CUSTOM_TYPE_ORDER, ensuring "Miscellaneous" is included
   return ["All", ...Array.from(types).filter((type) => CUSTOM_TYPE_ORDER.includes(type) || type === "Miscellaneous")]
     .sort((a, b) => CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b));
 };
-
 
 const fetchItemsByCategory = async (category) => {
   const queryConstraints =
@@ -44,11 +47,10 @@ const fetchItemsByCategory = async (category) => {
     return {
       id: doc.id,
       ...data,
-      Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous", // Map "Misc" to "Miscellaneous"
+      Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous",
     };
   });
 };
-
 
 const StarlightTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,13 +62,15 @@ const StarlightTable = () => {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
-    staleTime: Infinity,
+    staleTime: ITEM_STALE_TIME,
+    cacheTime: ITEM_CACHE_ITEM
   });
 
   const { data: items = [], isFetching, isError } = useQuery({
     queryKey: ["starlightItems", activeCategory],
     queryFn: () => fetchItemsByCategory(activeCategory),
-    staleTime: 60 * 60 * 1000,
+    staleTime: ITEM_STALE_TIME,
+    cacheTime: ITEM_CACHE_ITEM
   });
 
   useEffect(() => {
@@ -124,24 +128,42 @@ const StarlightTable = () => {
       {isError && <p className="text-red-500">Error loading items. Please try again later.</p>}
 
       {isFetching ? (
-        <p className="text-gray-400 text-center">Loading items...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array(8).fill().map((_, index) => (
+            <div key={index} className="bg-gray-700 p-4 rounded animate-pulse">
+              <div className="h-4 bg-gray-500 rounded mb-2"></div>
+              <div className="h-3 bg-gray-600 rounded w-3/4"></div>
+            </div>
+          ))}
+        </div>
       ) : sortedItems.length === 0 ? (
         <p className="text-gray-400 text-center">No items match your search or category.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {sortedItems.map((item) => (
             <div
               key={item.id}
-              className="bg-gray-800 p-4 rounded shadow hover:shadow-lg cursor-pointer flex justify-between items-center"
+              className="bg-gray-800 p-4 rounded shadow hover:shadow-lg hover:bg-gray-700 cursor-pointer flex justify-between transition-transform transform hover:scale-105"
               onClick={() => setSelectedItem(item)}
             >
-              <div>
-                <h2 className="text-md font-bold text-white">{item.Name}</h2>
-                <p className="text-gray-400 text-xs">{item.Type}</p>
+              {/* Left Column: Item Name and Type */}
+              <div className="flex flex-col justify-between">
+                <h2
+                  className="text-lg font-semibold text-white leading-tight break-words max-w-full sm:truncate sm:max-w-[150px] md:max-w-[200px]"
+                  title={item.Name} // Show full title on hover
+                >
+                  {item.Name}
+                </h2>
+                <p className="text-gray-500 text-sm">{item.Type}</p>
               </div>
-              <p className={`text-xs font-semibold ${getRarityColor(item.Rarity)}`}>
-                {item.Rarity}
-              </p>
+
+              {/* Right Column: Rarity and Price */}
+              <div className="flex flex-col items-end justify-between">
+                <p className={`text-sm font-medium ${getRarityColor(item.Rarity)}`}>
+                  {item.Rarity}
+                </p>
+                <p className="text-gray-400 text-sm mt-1">{item.Price ? `₵${formatPrice(item.Price)}` : "Price: N/A"}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -152,9 +174,9 @@ const StarlightTable = () => {
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
           onClick={() => setSelectedItem(null)}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
         >
           <div
@@ -196,6 +218,17 @@ const renderFields = (item, fields) => {
       );
     }
 
+    // Special handling for the 'Price' field
+    if (field === "Price") {
+      return (
+        <div key={field} className="text-gray-300 text-sm mb-2 grid grid-cols-[25%,75%] gap-4">
+          <div>
+            <strong>{fullFieldName}:</strong>
+          </div>
+          <div>{`₵${formatPrice(item[field])}`}</div>
+        </div>
+      );
+    }
     return (
       <div key={field} className="text-gray-300 text-sm mb-2 grid grid-cols-[25%,75%] gap-4">
         <div>

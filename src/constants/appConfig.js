@@ -86,3 +86,6 @@ export const CUSTOM_TYPE_ORDER = [
   ];  
   
   export const COLLECTION_NAME = "starlight_items";
+  export const ITEM_STALE_TIME = 2 * 24 * 60 * 60 * 1000 // 2 days
+  export const ITEM_CACHE_ITEM = 2 * 24 * 60 * 60 * 1000 // 2 days
+
