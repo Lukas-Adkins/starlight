@@ -154,3 +154,5 @@ dist
 .pnp.*
 
 upload.js
+apphosting.yaml
+.firebase

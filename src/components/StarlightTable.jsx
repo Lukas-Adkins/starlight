@@ -90,6 +90,7 @@ const fieldMapping = {
     "Pen",
     "Special / Notes",
     "Wt.",
+    "Range",
     "Price",
     "Description",
   ],
@@ -171,6 +172,7 @@ const fieldMapping = {
     "Wt.",
     "Price",
     "Description",
+    "Range",
     "Location",
   ],
   "Mech Utility": [

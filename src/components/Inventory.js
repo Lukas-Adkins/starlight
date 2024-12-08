@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useLocation} from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { FaEdit, FaTrash, FaCubes, FaBox } from "react-icons/fa";
+import { FaEdit, FaTrash, FaBox } from "react-icons/fa";
 
 const categories = ["Weapons", "Armor", "Magic Items", "Currencies", "Treasure", "Consumables", "Clothes", "Miscellaneous"];
 
