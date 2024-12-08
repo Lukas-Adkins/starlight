@@ -8,6 +8,7 @@ import Inventory from "./components/Inventory";
 import Characters from "./components/CharacterSelection";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
+import StarlightTable from "./components/StarlightTable"
 
 // Initialize React Query's QueryClient
 const queryClient = new QueryClient();
@@ -53,6 +54,14 @@ function AnimatedRoutes() {
           }
         />
         <Route
+          path="/items"
+          element={
+            <PageTransition>
+                <StarlightTable />
+            </PageTransition>
+          }
+        />
+        <Route
           path="/inventory/:characterId"
           element={
             <PageTransition>
@@ -94,7 +103,7 @@ function Home() {
   const { user } = useAuth();
   return (
     <div className="text-center">
-      <h2 className="text-4xl font-bold mb-8 text-center">Welcome to TTRPG Tools</h2>
+      <h2 className="text-4xl font-bold mb-8 text-center">Welcome to Starlight!</h2>
       {user ? (
         <p className="mt-4 text-gray-400">You're logged in as {user.email}.</p>
       ) : (

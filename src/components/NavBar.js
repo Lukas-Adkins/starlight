@@ -37,7 +37,19 @@ const NavBar = () => {
             <HomeIcon className="h-8 w-8" />
           </Link>
 
-          {/* Character Tracker Link (Visible to All Users) */}
+          {/* Items Page Link */}
+          <Link
+            to="/items"
+            className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
+              isActive("/items")
+                ? "bg-blue-600 text-white shadow-lg"
+                : "text-gray-300 hover:bg-gray-700"
+            }`}
+          >
+            Starlight Items
+          </Link>
+
+          {/* My Characters Link */}
           <Link
             to="/characters"
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
@@ -46,7 +58,7 @@ const NavBar = () => {
                 : "text-gray-300 hover:bg-gray-700"
             }`}
           >
-            Characters
+            My Characters
           </Link>
         </div>
 
