@@ -46,7 +46,7 @@ const NavBar = () => {
                 : "text-gray-300 hover:bg-gray-700"
             }`}
           >
-            Starlight Items
+            Items
           </Link>
 
           {/* My Characters Link */}
@@ -58,7 +58,7 @@ const NavBar = () => {
                 : "text-gray-300 hover:bg-gray-700"
             }`}
           >
-            My Characters
+            Characters
           </Link>
         </div>
 

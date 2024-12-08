@@ -56,7 +56,7 @@ const StarlightTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
-
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
   const { data: categories = [] } = useQuery({
@@ -79,12 +79,19 @@ const StarlightTable = () => {
     }
   }, [categories, queryClient]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // 300ms delay
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   const filteredItems = React.useMemo(() => {
-    if (!searchTerm) return items;
+    if (!debouncedSearchTerm) return items;
     return items.filter((item) =>
-      item.Name.toLowerCase().includes(searchTerm.toLowerCase())
+      item.Name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
-  }, [items, searchTerm]);
+  }, [items, debouncedSearchTerm]);  
 
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
