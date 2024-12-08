@@ -88,4 +88,8 @@ export const CUSTOM_TYPE_ORDER = [
   export const COLLECTION_NAME = "starlight_items";
   export const ITEM_STALE_TIME = 2 * 24 * 60 * 60 * 1000 // 2 days
   export const ITEM_CACHE_ITEM = 2 * 24 * 60 * 60 * 1000 // 2 days
+  export const MAX_CACHE_SIZE = 14;
   export const DEFAULT_CATEGORY = "Ranged Weapon";
+  export const CATEGORIES = {
+    "types": ["Ranged Weapon", "Melee Weapon", "Miscellaneous", "Armor", "Consumable", "Cybernetic", "Explosive", "Mech", "Mech Engine", "Mech Melee Weapon", "Mech Ranged Weapon", "Mech Utility", "Special Ammo", "Weapon Mod"]
+  }
