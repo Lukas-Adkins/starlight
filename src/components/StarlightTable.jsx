@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const rarityOrder = {
@@ -48,10 +48,30 @@ const getRarityColor = (rarity) => {
   }
 };
 
+const fullFieldNames = {
+  "Mag": "Magazine Size",
+  "Rld": "Reload Time",
+  "RoF": "Rate of Fire",
+  "Wt.": "Weight",
+  "Pen": "Penetration",
+  "Dmg": "Damage",
+  "Special / Notes": "Special",
+  "Location": "Location",
+  "Class": "Class",
+  "Price": "Price",
+  "Rarity": "Rarity",
+  "Range": "Range",
+  "Max Ag": "Max Agility",
+  "AP": "Armor Points",
+  "Slots": "Cybernetic Slots",
+  "Mech Slot": "Mech Slot",
+  "Type": "Type",
+  "Url": "Url",
+  "Description": "Description",
+};
+
 const fieldMapping = {
   "Ranged Weapon": [
-    "Name",
-    "CRarity",
     "Class",
     "Range",
     "RoF",
@@ -61,21 +81,120 @@ const fieldMapping = {
     "Rld",
     "Special / Notes",
     "Wt.",
-    "Type",
+    "Price",
     "Description",
   ],
   "Melee Weapon": [
-    "Name",
-    "CRarity",
     "Class",
     "Dmg",
     "Pen",
     "Special / Notes",
     "Wt.",
-    "Type",
+    "Price",
     "Description",
   ],
-  // Add more type-specific fields here...
+  "Explosive": [
+    "Class",
+    "Range",
+    "Dmg",
+    "Pen",
+    "Special / Notes",
+    "Wt.",
+    "Price",
+    "Description",
+  ],
+  "Armor": [
+    "Max Ag",
+    "Special / Notes",
+    "Covers",
+    "AP",
+    "Wt.",
+    "Price",
+    "Description",
+  ],
+  "Cybernetic": [
+    "Special / Notes",
+    "Slots",
+    "Price",
+    "Description",
+  ],
+  "Miscellaneous": [
+    "Special / Notes",
+    "Price",
+    "Wt.",
+    "Description",
+  ],
+  "Weapon Mod": [
+    "Special / Notes",
+    "Price",
+    "Wt.",
+    "Description",
+  ],
+  "Special Ammo": [
+    "Special / Notes",
+    "Price",
+    "Wt.",
+    "Description",
+  ],
+  "Consumable": [
+    "Special / Notes",
+    "Price",
+    "Wt.",
+    "Description",
+  ],
+  "Mech": [
+    "Special / Notes",
+    "Price",
+    "Wt.",
+    "Description",
+    "Url"
+  ],
+  "Mech Ranged Weapon": [
+    "Class",
+    "Range",
+    "RoF",
+    "Dmg",
+    "Pen",
+    "Mag",
+    "Rld",
+    "Special / Notes",
+    "Wt.",
+    "Price",
+    "Description",
+    "Location"
+  ],
+  "Mech Melee Weapon": [
+    "Class",
+    "Dmg",
+    "Pen",
+    "Special / Notes",
+    "Wt.",
+    "Price",
+    "Description",
+    "Location",
+  ],
+  "Mech Utility": [
+    "Class",
+    "Dmg",
+    "Pen",
+    "Special / Notes",
+    "Wt.",
+    "Price",
+    "Description",
+    "Location",
+    "Mech Slot"
+  ],
+  "Mech Engine": [
+    "Class",
+    "Dmg",
+    "Pen",
+    "Special / Notes",
+    "Wt.",
+    "Price",
+    "Description",
+    "Location",
+    "Mech Slot"
+  ],
 };
 
   // Custom sorting order for item types
@@ -85,7 +204,7 @@ const fieldMapping = {
     "Explosive",
     "Armor",
     "Cybernetic",
-    "Misc",
+    "Miscellaneous",
     "Weapon Mod",
     "Special Ammo",
     "Consumable",
@@ -103,7 +222,7 @@ const fetchAllItems = async () => {
     return {
       id: doc.id,
       ...data,
-      Type: data.Type || "Miscellaneous",
+      Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous", // Replace 'Misc' with 'Miscellaneous'
     };
   });
 };
@@ -251,39 +370,36 @@ const StarlightTable = () => {
   );
 };
 
-// Function to render fields grouped by category
 const renderFields = (item, fields) => {
-  const groupedFields = {
-    stats: ["Range", "Dmg", "Pen", "RoF", "Mag", "Rld"],  // Example: group stats-related fields
-    description: ["Description", "Special / Notes", "Location"],  // Example: group description-related fields
-    misc: ["Weight", "Price", "Slots"],  // Example: other miscellaneous fields
-    // Add more categories as needed
-  };
+  return fields.map((field) => {
+    const fullFieldName = fullFieldNames[field] || field;  // Replace short name with full name
+    if (!item[field] || item[field] === "N/A") return null; // Skip empty fields
 
-  const renderSection = (sectionName, sectionFields) => {
+    // Special handling for the 'Url' field to display "Link" without the category
+    if (field === "Url" && item[field]) {
+      return (
+        <div key={field} className="text-gray-300 text-sm mb-2">
+          <a
+            href={item[field]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center"
+          >
+            Link <FaExternalLinkAlt className="ml-1 text-gray-500" />
+          </a>
+        </div>
+      );
+    }
+
     return (
-      <div key={sectionName} className="mb-4">
-        <h3 className="text-lg font-semibold text-white mb-2">{sectionName}</h3>
-        {sectionFields.map((field) => {
-          if (!item[field] || item[field] === "N/A") return null;
-          return (
-            <div key={field} className="text-gray-300 text-sm mb-2">
-              <strong>{field}:</strong> {item[field]}
-            </div>
-          );
-        })}
+      <div key={field} className="text-gray-300 text-sm mb-2 grid grid-cols-[25%,75%] gap-4">
+        <div>
+          <strong>{fullFieldName}:</strong>
+        </div>
+        <div>{item[field]}</div>
       </div>
     );
-  };
-
-  return (
-    <>
-      {Object.keys(groupedFields).map((section) => {
-        const sectionFields = groupedFields[section];
-        return renderSection(section, sectionFields);
-      })}
-    </>
-  );
+  });
 };
 
 
