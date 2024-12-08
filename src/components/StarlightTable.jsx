@@ -78,6 +78,24 @@ const fieldMapping = {
   // Add more type-specific fields here...
 };
 
+  // Custom sorting order for item types
+  const customTypeOrder = [
+    "Ranged Weapon",
+    "Melee Weapon",
+    "Explosive",
+    "Armor",
+    "Cybernetic",
+    "Misc",
+    "Weapon Mod",
+    "Special Ammo",
+    "Consumable",
+    "Mech",
+    "Mech Ranged Weapon",
+    "Mech Melee Weapon",
+    "Mech Utility",
+    "Mech Engine",
+  ];
+
 const fetchAllItems = async () => {
   const snapshot = await getDocs(collection(db, "starlight_items"));
   return snapshot.docs.map((doc) => {
@@ -92,7 +110,7 @@ const fetchAllItems = async () => {
 
 const StarlightTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
 
   const { data: items = [], isFetching, isError } = useQuery({
@@ -102,17 +120,21 @@ const StarlightTable = () => {
   });
 
   const categories = React.useMemo(() => {
-    const uniqueTypes = [...new Set(items.map((item) => item.Type).filter(Boolean))].sort();
-    return ["All", ...uniqueTypes];
+    const uniqueTypes = [...new Set(items.map((item) => item.Type).filter(Boolean))];
+    return ["All", ...uniqueTypes.filter((type) => customTypeOrder.includes(type))].sort(
+      (a, b) => customTypeOrder.indexOf(a) - customTypeOrder.indexOf(b)
+    );
   }, [items]);
 
   const filteredItems = items.filter((item) => {
+    // If search term is active, ignore category filter
+    const matchesSearch = item.Name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
       activeCategory === "All" || (item.Type || "Miscellaneous") === activeCategory;
-    const matchesSearch = item.Name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+  
+    // If there's a search term, only match the search. Otherwise, apply category filter as well.
+    return matchesSearch && (searchTerm ? true : matchesCategory);
   });
-
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
       if (a.Type < b.Type) return -1;
@@ -138,7 +160,6 @@ const StarlightTable = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold text-center mb-6">Starlight Items</h1>
 
       {/* Search Bar and Dropdown */}
       <div className="flex items-center mb-4 gap-4">
@@ -181,10 +202,10 @@ const StarlightTable = () => {
             className="bg-gray-800 p-4 rounded shadow hover:shadow-lg cursor-pointer flex justify-between items-center"
             onClick={() => setSelectedItem(item)}
           >
-            <div>
-              <h2 className="text-md font-bold text-white">{item.Name}</h2>
-              <p className="text-gray-400 text-xs">{item.Type}</p>
-            </div>
+          <div>
+            <h2 className="text-md font-bold text-white">{item.Name}</h2>
+            <p className="text-gray-400 text-xs">{item.Type}</p>
+          </div>
             <p
               className={`text-xs font-semibold ${getRarityColor(item.Rarity)}`}
             >
@@ -199,7 +220,7 @@ const StarlightTable = () => {
       {selectedItem && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setSelectedItem(null)}
+          onClick={() => setSelectedItem(null)} // Close modal when clicking the overlay
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -207,7 +228,7 @@ const StarlightTable = () => {
         >
           <div
             className="bg-gray-800 p-6 rounded shadow-lg max-w-lg w-full relative"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal content
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal content
           >
             {/* Close Button */}
             <button
@@ -216,8 +237,11 @@ const StarlightTable = () => {
             >
               ✕
             </button>
-            
+
+            {/* Item Name */}
             <h2 className="text-xl font-bold text-white mb-4">{selectedItem.Name}</h2>
+
+            {/* Render Fields Dynamically */}
             {renderFields(selectedItem, fieldMapping[selectedItem.Type] || Object.keys(selectedItem))}
           </div>
         </motion.div>
@@ -227,12 +251,40 @@ const StarlightTable = () => {
   );
 };
 
+// Function to render fields grouped by category
 const renderFields = (item, fields) => {
-  return fields.map((field) => (
-    <div key={field} className="text-gray-300 text-sm">
-      <strong>{field}:</strong> {item[field] || "N/A"}
-    </div>
-  ));
+  const groupedFields = {
+    stats: ["Range", "Dmg", "Pen", "RoF", "Mag", "Rld"],  // Example: group stats-related fields
+    description: ["Description", "Special / Notes", "Location"],  // Example: group description-related fields
+    misc: ["Weight", "Price", "Slots"],  // Example: other miscellaneous fields
+    // Add more categories as needed
+  };
+
+  const renderSection = (sectionName, sectionFields) => {
+    return (
+      <div key={sectionName} className="mb-4">
+        <h3 className="text-lg font-semibold text-white mb-2">{sectionName}</h3>
+        {sectionFields.map((field) => {
+          if (!item[field] || item[field] === "N/A") return null;
+          return (
+            <div key={field} className="text-gray-300 text-sm mb-2">
+              <strong>{field}:</strong> {item[field]}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {Object.keys(groupedFields).map((section) => {
+        const sectionFields = groupedFields[section];
+        return renderSection(section, sectionFields);
+      })}
+    </>
+  );
 };
+
 
 export default StarlightTable;
