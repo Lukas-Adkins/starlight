@@ -220,7 +220,7 @@ const StarlightTable = () => {
               FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
             ).map((field, index) =>
               field ? (
-                React.isValidElement(field) && field.key === "Description" ? (
+                React.isValidElement(field) && (field.key === "Description" || field.key === "Special / Notes") ? (
                   // Wide fields (e.g., Description)
                   <div key={index} className="col-span-1 sm:col-span-2">
                     {field}
@@ -244,14 +244,19 @@ const StarlightTable = () => {
 };
 
 const renderFields = (item, fields) => {
-  return fields.map((field) => {
+
+  const reorderedFields = fields
+  .filter((field) => field !== "Special / Notes" && field !== "Description")
+  .concat(["Special / Notes", "Description"]);
+
+  return reorderedFields.map((field) => {
     const fullFieldName = FULL_FIELD_NAMES[field] || field;
 
     // Skip empty or undefined fields
     if (!item[field] || item[field] === "N/A") return null;
 
     // Special case for 'Description'
-    if (field === "Description") {
+    if (field === "Description" || field === "Special / Notes") {
       return (
         <div
           key={field}
