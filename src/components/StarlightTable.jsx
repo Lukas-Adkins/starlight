@@ -1,50 +1,87 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { collection, getDocs } from "firebase/firestore";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
-import {RARITY_ORDER, FULL_FIELD_NAMES, FIELD_MAPPING, CUSTOM_TYPE_ORDER, COLLECTION_NAME, getRarityColor} from "../constants/appConfig"
+import {
+  RARITY_ORDER,
+  FULL_FIELD_NAMES,
+  FIELD_MAPPING,
+  CUSTOM_TYPE_ORDER,
+  COLLECTION_NAME,
+  getRarityColor,
+} from "../constants/appConfig";
 
-const fetchAllItems = async () => {
+const fetchCategories = async () => {
   const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+  const types = new Set(
+    snapshot.docs.map((doc) => {
+      const type = doc.data().Type || "Miscellaneous";
+      return type === "Misc" ? "Miscellaneous" : type; // Map "Misc" to "Miscellaneous"
+    })
+  );
+
+  // Add missing categories explicitly
+  if (!types.has("Ranged Weapon")) {
+    types.add("Ranged Weapon");
+  }
+
+  // Sort by CUSTOM_TYPE_ORDER, ensuring "Miscellaneous" is included
+  return ["All", ...Array.from(types).filter((type) => CUSTOM_TYPE_ORDER.includes(type) || type === "Miscellaneous")]
+    .sort((a, b) => CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b));
+};
+
+
+const fetchItemsByCategory = async (category) => {
+  const queryConstraints =
+    category && category !== "All" ? [where("Type", "==", category === "Miscellaneous" ? "Misc" : category)] : [];
+  const itemsQuery = query(collection(db, COLLECTION_NAME), ...queryConstraints);
+  const snapshot = await getDocs(itemsQuery);
+
   return snapshot.docs.map((doc) => {
     const data = doc.data();
     return {
       id: doc.id,
       ...data,
-      Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous", // Replace 'Misc' with 'Miscellaneous'
+      Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous", // Map "Misc" to "Miscellaneous"
     };
   });
 };
+
 
 const StarlightTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const queryClient = useQueryClient();
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+    staleTime: Infinity,
+  });
+
   const { data: items = [], isFetching, isError } = useQuery({
-    queryKey: ["starlightItems"],
-    queryFn: fetchAllItems,
+    queryKey: ["starlightItems", activeCategory],
+    queryFn: () => fetchItemsByCategory(activeCategory),
     staleTime: 60 * 60 * 1000,
   });
 
-  const categories = React.useMemo(() => {
-    const uniqueTypes = [...new Set(items.map((item) => item.Type).filter(Boolean))];
-    return ["All", ...uniqueTypes.filter((type) => CUSTOM_TYPE_ORDER.includes(type))].sort(
-      (a, b) => CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b)
-    );
-  }, [items]);
+  useEffect(() => {
+    if (categories.length > 0) {
+      queryClient.prefetchQuery(["starlightItems", "All"], () => fetchItemsByCategory("All"));
+    }
+  }, [categories, queryClient]);
 
-  const filteredItems = items.filter((item) => {
-    // If search term is active, ignore category filter
-    const matchesSearch = item.Name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      activeCategory === "All" || (item.Type || "Miscellaneous") === activeCategory;
-  
-    // If there's a search term, only match the search. Otherwise, apply category filter as well.
-    return matchesSearch && (searchTerm ? true : matchesCategory);
-  });
+  const filteredItems = React.useMemo(() => {
+    if (!searchTerm) return items;
+    return items.filter((item) =>
+      item.Name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [items, searchTerm]);
+
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
       if (a.Type < b.Type) return -1;
@@ -55,22 +92,8 @@ const StarlightTable = () => {
     });
   }, [filteredItems]);
 
-  // Handle ESC key press to close modal
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && selectedItem) {
-        setSelectedItem(null);
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => {
-      window.removeEventListener("keydown", handleEsc);
-    };
-  }, [selectedItem]);
-
   return (
     <div className="container mx-auto px-4">
-
       {/* Search Bar and Dropdown */}
       <div className="flex items-center mb-4 gap-4">
         <div className="flex items-center relative flex-grow">
@@ -106,31 +129,29 @@ const StarlightTable = () => {
         <p className="text-gray-400 text-center">No items match your search or category.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-        {sortedItems.map((item) => (
-          <div
-            key={item.id}
-            className="bg-gray-800 p-4 rounded shadow hover:shadow-lg cursor-pointer flex justify-between items-center"
-            onClick={() => setSelectedItem(item)}
-          >
-          <div>
-            <h2 className="text-md font-bold text-white">{item.Name}</h2>
-            <p className="text-gray-400 text-xs">{item.Type}</p>
-          </div>
-            <p
-              className={`text-xs font-semibold ${getRarityColor(item.Rarity)}`}
+          {sortedItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-gray-800 p-4 rounded shadow hover:shadow-lg cursor-pointer flex justify-between items-center"
+              onClick={() => setSelectedItem(item)}
             >
-              {item.Rarity}
-            </p>
-          </div>
-        ))}
-      </div>      
+              <div>
+                <h2 className="text-md font-bold text-white">{item.Name}</h2>
+                <p className="text-gray-400 text-xs">{item.Type}</p>
+              </div>
+              <p className={`text-xs font-semibold ${getRarityColor(item.Rarity)}`}>
+                {item.Rarity}
+              </p>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Modal */}
       {selectedItem && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setSelectedItem(null)} // Close modal when clicking the overlay
+          onClick={() => setSelectedItem(null)}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -138,35 +159,28 @@ const StarlightTable = () => {
         >
           <div
             className="bg-gray-800 p-6 rounded shadow-lg max-w-lg w-full relative"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal content
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
             <button
               onClick={() => setSelectedItem(null)}
               className="absolute top-2 right-2 text-gray-400 hover:text-white text-3xl p-2 hover:bg-gray-700 rounded-full"
             >
               ✕
             </button>
-
-            {/* Item Name */}
             <h2 className="text-xl font-bold text-white mb-4">{selectedItem.Name}</h2>
-
-            {/* Render Fields Dynamically */}
             {renderFields(selectedItem, FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem))}
           </div>
         </motion.div>
       )}
-
     </div>
   );
 };
 
 const renderFields = (item, fields) => {
   return fields.map((field) => {
-    const fullFieldName = FULL_FIELD_NAMES[field] || field;  // Replace short name with full name
-    if (!item[field] || item[field] === "N/A") return null; // Skip empty fields
+    const fullFieldName = FULL_FIELD_NAMES[field] || field;
+    if (!item[field] || item[field] === "N/A") return null;
 
-    // Special handling for the 'Url' field to display "Link" without the category
     if (field === "Url" && item[field]) {
       return (
         <div key={field} className="text-gray-300 text-sm mb-2">
@@ -192,6 +206,5 @@ const renderFields = (item, fields) => {
     );
   });
 };
-
 
 export default StarlightTable;
