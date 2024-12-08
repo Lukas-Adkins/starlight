@@ -22,6 +22,19 @@ const formatPrice = (price) => {
   return price.toLocaleString("en-US"); // Format number with commas
 };
 
+const useBodyScrollLock = (isLocked) => {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isLocked]);
+};
+
 const StarlightTable = () => {
   const categories = [...CATEGORIES.types.sort((a, b) => {
     return CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b);
@@ -32,6 +45,8 @@ const StarlightTable = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [setCategoryCache] = useState({});
+
+  useBodyScrollLock(!!selectedItem);
 
   const fetchItemsByCategory = async (category) => {
     const cacheKey = `categoryCache_${category}`; // Unique key for each category
@@ -190,55 +205,55 @@ const StarlightTable = () => {
       {/* Modal */}
       {selectedItem && (
         <motion.div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
-        onClick={() => setSelectedItem(null)}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div
-          className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative"
-          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
+          onClick={() => setSelectedItem(null)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          {/* Close Button */}
-          <button
-            onClick={() => setSelectedItem(null)}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
-            aria-label="Close"
+          <div
+            className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative max-h-screen overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            ✕
-          </button>
-      
-          {/* Item Name */}
-          <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
-      
-          {/* Item Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {renderFields(
-              selectedItem,
-              FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
-            ).map((field, index) =>
-              field ? (
-                React.isValidElement(field) && (field.key === "Description" || field.key === "Special / Notes") ? (
-                  // Wide fields (e.g., Description)
-                  <div key={index} className="col-span-1 sm:col-span-2">
-                    {field}
-                  </div>
-                ) : (
-                  // Regular fields
-                  <div key={index} className="col-span-1">
-                    {field}
-                  </div>
-                )
-              ) : null
-            )}
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
+              aria-label="Close"
+            >
+              ✕
+            </button>
 
+            {/* Item Name */}
+            <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
+
+            {/* Item Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {renderFields(
+                selectedItem,
+                FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
+              ).map((field, index) =>
+                field ? (
+                  React.isValidElement(field) &&
+                  (field.key === "Description" || field.key === "Special / Notes") ? (
+                    // Wide fields (e.g., Description)
+                    <div key={index} className="col-span-1 sm:col-span-2">
+                      {field}
+                    </div>
+                  ) : (
+                    // Regular fields
+                    <div key={index} className="col-span-1">
+                      {field}
+                    </div>
+                  )
+                ) : null
+              )}
+            </div>
           </div>
-        </div>
-      </motion.div>
-      
+        </motion.div>
       )}
+
     </div>
   );
 };
