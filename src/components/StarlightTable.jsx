@@ -31,13 +31,18 @@ const StarlightTable = () => {
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [categoryCache, setCategoryCache] = useState({});
+  const [setCategoryCache] = useState({});
 
   const fetchItemsByCategory = async (category) => {
-    if (categoryCache[category]) {
-      return categoryCache[category]; // Return cached data if available
+    const cacheKey = `categoryCache_${category}`; // Unique key for each category
+  
+    // Check if data exists in localStorage
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData); // Return parsed data if available
     }
   
+    // Fetch from Firestore if not in localStorage
     const queryConstraints = [where("Type", "==", category === "Miscellaneous" ? "Misc" : category)];
     const itemsQuery = query(collection(db, COLLECTION_NAME), ...queryConstraints);
     const snapshot = await getDocs(itemsQuery);
@@ -51,19 +56,23 @@ const StarlightTable = () => {
       };
     });
   
+    // Save the result to localStorage
+    localStorage.setItem(cacheKey, JSON.stringify(items));
+  
+    // Optionally, update in-memory cache
     setCategoryCache((prevCache) => {
       const newCache = { ...prevCache, [category]: items };
-    
+  
       // Limit cache size
       if (Object.keys(newCache).length > MAX_CACHE_SIZE) {
         delete newCache[Object.keys(newCache)[0]]; // Remove the oldest entry
       }
-    
+  
       return newCache;
     });
   
     return items;
-  };
+  };  
 
   const { data: items = [], isFetching, isError } = useQuery({
     queryKey: ["starlightItems", activeCategory],
@@ -181,27 +190,54 @@ const StarlightTable = () => {
       {/* Modal */}
       {selectedItem && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setSelectedItem(null)}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
+        onClick={() => setSelectedItem(null)}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div
+          className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="bg-gray-800 p-6 rounded shadow-lg max-w-lg w-full relative"
-            onClick={(e) => e.stopPropagation()}
+          {/* Close Button */}
+          <button
+            onClick={() => setSelectedItem(null)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
+            aria-label="Close"
           >
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-white text-3xl p-2 hover:bg-gray-700 rounded-full"
-            >
-              ✕
-            </button>
-            <h2 className="text-xl font-bold text-white mb-4">{selectedItem.Name}</h2>
-            {renderFields(selectedItem, FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem))}
+            ✕
+          </button>
+      
+          {/* Item Name */}
+          <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
+      
+          {/* Item Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {renderFields(
+              selectedItem,
+              FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
+            ).map((field, index) =>
+              field ? (
+                React.isValidElement(field) && field.key === "Description" ? (
+                  // Wide fields (e.g., Description)
+                  <div key={index} className="col-span-1 sm:col-span-2">
+                    {field}
+                  </div>
+                ) : (
+                  // Regular fields
+                  <div key={index} className="col-span-1">
+                    {field}
+                  </div>
+                )
+              ) : null
+            )}
+
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
+      
       )}
     </div>
   );
@@ -210,43 +246,84 @@ const StarlightTable = () => {
 const renderFields = (item, fields) => {
   return fields.map((field) => {
     const fullFieldName = FULL_FIELD_NAMES[field] || field;
+
+    // Skip empty or undefined fields
     if (!item[field] || item[field] === "N/A") return null;
 
-    if (field === "Url" && item[field]) {
+    // Special case for 'Description'
+    if (field === "Description") {
       return (
-        <div key={field} className="text-gray-300 text-sm mb-2">
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
+        >
+          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
+          <DescriptionField text={item[field]} />
+        </div>
+      );
+    }
+
+    // Special case for 'URL'
+    if (field === "Url") {
+      return (
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
+        >
+          <strong className="text-gray-400">{fullFieldName}:</strong>
           <a
             href={item[field]}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline flex items-center"
           >
-            Link <FaExternalLinkAlt className="ml-1 text-gray-500" />
+            Image <FaExternalLinkAlt className="ml-2" />
           </a>
         </div>
       );
     }
 
-    // Special handling for the 'Price' field
-    if (field === "Price") {
-      return (
-        <div key={field} className="text-gray-300 text-sm mb-2 grid grid-cols-[25%,75%] gap-4">
-          <div>
-            <strong>{fullFieldName}:</strong>
-          </div>
-          <div>{`₵${formatPrice(item[field])}`}</div>
-        </div>
-      );
-    }
+    // Default field layout for other fields
     return (
-      <div key={field} className="text-gray-300 text-sm mb-2 grid grid-cols-[25%,75%] gap-4">
-        <div>
-          <strong>{fullFieldName}:</strong>
-        </div>
-        <div>{item[field]}</div>
+      <div
+        key={field}
+        className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
+      >
+        <span className="font-semibold text-gray-400">{fullFieldName}:</span>
+        <span className="text-gray-100">
+          {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
+        </span>
       </div>
     );
   });
 };
+
+
+
+
+// Component for handling expandable/collapsible text
+const DescriptionField = ({ text }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const truncatedText = text.length > 300 ? text.slice(0, 300) + "..." : text;
+
+  return (
+    <div>
+      <p className="text-gray-200 leading-relaxed">
+        {isExpanded ? text : truncatedText}
+      </p>
+      {text.length > 300 && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 text-blue-500 hover:underline"
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+
 
 export default StarlightTable;

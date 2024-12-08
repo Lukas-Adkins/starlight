@@ -100,15 +100,23 @@ function PageTransition({ children }) {
 }
 
 function Home() {
-  const { user } = useAuth();
+
   return (
-    <div className="text-center">
-      <h2 className="text-4xl font-bold mb-8 text-center">Welcome to Starlight!</h2>
-      {user ? (
-        <p className="mt-4 text-gray-400">You're logged in as {user.email}.</p>
-      ) : (
-        <p className="mt-4 text-gray-400">Please log in to access tools.</p>
-      )}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="text-center max-w-2xl">
+        <h1 className="text-5xl font-bold mb-6">Welcome to Starlight!</h1>
+        <p className="text-lg text-gray-400 mb-8">
+          Starlight is your go-to tool for exploring the Starlight setting and game system.
+        </p>
+      </div>
+      <div className="mt-12">
+        <a
+          href="/items"
+          className="px-6 py-3 bg-blue-600 text-white text-lg rounded hover:bg-blue-500 transition-colors"
+        >
+          Explore Items
+        </a>
+      </div>
     </div>
   );
 }
