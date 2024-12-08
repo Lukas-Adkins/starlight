@@ -4,221 +4,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
-
-const rarityOrder = {
-  Unique: 11,
-  "Near Unique": 10,
-  "Extremely Rare": 9,
-  "Very Rare": 8,
-  Rare: 7,
-  Scarce: 6,
-  Average: 5,
-  Common: 4,
-  Plentiful: 3,
-  Abundant: 2,
-  Ubiquitous: 1,
-};
-
-const getRarityColor = (rarity) => {
-  switch (rarity) {
-    case "Unique":
-      return "text-yellow-500"; // Unique = yellow
-    case "Near Unique":
-      return "text-orange-500"; // Near Unique = orange
-    case "Extremely Rare":
-      return "text-red-500"; // Extremely Rare = red
-    case "Very Rare":
-      return "text-pink-500"; // Very Rare = pink
-    case "Rare":
-      return "text-purple-500"; // Rare = purple
-    case "Scarce":
-      return "text-blue-500"; // Scarce = blue
-    case "Average":
-      return "text-green-500"; // Average = green
-    case "Common":
-      return "text-gray-500"; // Common = gray
-    case "Plentiful":
-      return "text-teal-500"; // Plentiful = teal
-    case "Abundant":
-      return "text-lime-500"; // Abundant = lime
-    case "Ubiquitous":
-      return "text-emerald-500"; // Ubiquitous = emerald
-    default:
-      return "text-gray-500"; // Default gray if no rarity
-  }
-};
-
-const fullFieldNames = {
-  "Mag": "Magazine Size",
-  "Rld": "Reload Time",
-  "RoF": "Rate of Fire",
-  "Wt.": "Weight",
-  "Pen": "Penetration",
-  "Dmg": "Damage",
-  "Special / Notes": "Special",
-  "Location": "Location",
-  "Class": "Class",
-  "Price": "Price",
-  "Rarity": "Rarity",
-  "Range": "Range",
-  "Max Ag": "Max Agility",
-  "AP": "Armor Points",
-  "Slots": "Cybernetic Slots",
-  "Mech Slot": "Mech Slot",
-  "Type": "Type",
-  "Url": "Url",
-  "Description": "Description",
-};
-
-const fieldMapping = {
-  "Ranged Weapon": [
-    "Class",
-    "Range",
-    "RoF",
-    "Dmg",
-    "Pen",
-    "Mag",
-    "Rld",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-  ],
-  "Melee Weapon": [
-    "Class",
-    "Dmg",
-    "Pen",
-    "Special / Notes",
-    "Wt.",
-    "Range",
-    "Price",
-    "Description",
-  ],
-  "Explosive": [
-    "Class",
-    "Range",
-    "Dmg",
-    "Pen",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-  ],
-  "Armor": [
-    "Max Ag",
-    "Special / Notes",
-    "Covers",
-    "AP",
-    "Wt.",
-    "Price",
-    "Description",
-  ],
-  "Cybernetic": [
-    "Special / Notes",
-    "Slots",
-    "Price",
-    "Description",
-  ],
-  "Miscellaneous": [
-    "Special / Notes",
-    "Price",
-    "Wt.",
-    "Description",
-  ],
-  "Weapon Mod": [
-    "Special / Notes",
-    "Price",
-    "Wt.",
-    "Description",
-  ],
-  "Special Ammo": [
-    "Special / Notes",
-    "Price",
-    "Wt.",
-    "Description",
-  ],
-  "Consumable": [
-    "Special / Notes",
-    "Price",
-    "Wt.",
-    "Description",
-  ],
-  "Mech": [
-    "Special / Notes",
-    "Price",
-    "Wt.",
-    "Description",
-    "Url"
-  ],
-  "Mech Ranged Weapon": [
-    "Class",
-    "Range",
-    "RoF",
-    "Dmg",
-    "Pen",
-    "Mag",
-    "Rld",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-    "Location"
-  ],
-  "Mech Melee Weapon": [
-    "Class",
-    "Dmg",
-    "Pen",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-    "Range",
-    "Location",
-  ],
-  "Mech Utility": [
-    "Class",
-    "Dmg",
-    "Pen",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-    "Location",
-    "Mech Slot"
-  ],
-  "Mech Engine": [
-    "Class",
-    "Dmg",
-    "Pen",
-    "Special / Notes",
-    "Wt.",
-    "Price",
-    "Description",
-    "Location",
-    "Mech Slot"
-  ],
-};
-
-  // Custom sorting order for item types
-  const customTypeOrder = [
-    "Ranged Weapon",
-    "Melee Weapon",
-    "Explosive",
-    "Armor",
-    "Cybernetic",
-    "Miscellaneous",
-    "Weapon Mod",
-    "Special Ammo",
-    "Consumable",
-    "Mech",
-    "Mech Ranged Weapon",
-    "Mech Melee Weapon",
-    "Mech Utility",
-    "Mech Engine",
-  ];
+import {RARITY_ORDER, FULL_FIELD_NAMES, FIELD_MAPPING, CUSTOM_TYPE_ORDER, COLLECTION_NAME, getRarityColor} from "../constants/appConfig"
 
 const fetchAllItems = async () => {
-  const snapshot = await getDocs(collection(db, "starlight_items"));
+  const snapshot = await getDocs(collection(db, COLLECTION_NAME));
   return snapshot.docs.map((doc) => {
     const data = doc.data();
     return {
@@ -242,8 +31,8 @@ const StarlightTable = () => {
 
   const categories = React.useMemo(() => {
     const uniqueTypes = [...new Set(items.map((item) => item.Type).filter(Boolean))];
-    return ["All", ...uniqueTypes.filter((type) => customTypeOrder.includes(type))].sort(
-      (a, b) => customTypeOrder.indexOf(a) - customTypeOrder.indexOf(b)
+    return ["All", ...uniqueTypes.filter((type) => CUSTOM_TYPE_ORDER.includes(type))].sort(
+      (a, b) => CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b)
     );
   }, [items]);
 
@@ -260,8 +49,8 @@ const StarlightTable = () => {
     return [...filteredItems].sort((a, b) => {
       if (a.Type < b.Type) return -1;
       if (a.Type > b.Type) return 1;
-      const rarityA = rarityOrder[a.Rarity] || 100;
-      const rarityB = rarityOrder[b.Rarity] || 100;
+      const rarityA = RARITY_ORDER[a.Rarity] || 100;
+      const rarityB = RARITY_ORDER[b.Rarity] || 100;
       return rarityA - rarityB;
     });
   }, [filteredItems]);
@@ -363,7 +152,7 @@ const StarlightTable = () => {
             <h2 className="text-xl font-bold text-white mb-4">{selectedItem.Name}</h2>
 
             {/* Render Fields Dynamically */}
-            {renderFields(selectedItem, fieldMapping[selectedItem.Type] || Object.keys(selectedItem))}
+            {renderFields(selectedItem, FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem))}
           </div>
         </motion.div>
       )}
@@ -374,7 +163,7 @@ const StarlightTable = () => {
 
 const renderFields = (item, fields) => {
   return fields.map((field) => {
-    const fullFieldName = fullFieldNames[field] || field;  // Replace short name with full name
+    const fullFieldName = FULL_FIELD_NAMES[field] || field;  // Replace short name with full name
     if (!item[field] || item[field] === "N/A") return null; // Skip empty fields
 
     // Special handling for the 'Url' field to display "Link" without the category
