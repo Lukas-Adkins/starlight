@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+.react-tooltip {
+  padding: 8px;
+  background-color: #333; /* Tooltip background */
+  color: #fff; /* Tooltip text color */
+  border-radius: 4px; /* Smooth corners */
+  font-size: 0.875rem; /* Mobile-friendly font size */
+  max-width: 90vw; /* Constrain width to viewport */
+  white-space: normal; /* Allow content wrapping */
+  word-wrap: break-word; /* Handle long words */
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+[data-tooltip-id]:hover::after {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}

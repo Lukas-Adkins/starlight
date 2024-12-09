@@ -275,22 +275,18 @@ const DescriptionField = ({ text, enableTooltips = false }) => {
   );
 };
 
-
 const highlightWithTooltips = (text) => {
   if (!ALLOWED_TOOLTIP_CATEGORIES.includes(activeCategory)) return text;
 
   if (typeof text !== "string") return text;
 
-  // Sort keys to prioritize longer phrases first
   const sortedTraits = Object.keys(TRAIT_TOOLTIPS).sort((a, b) => b.length - a.length);
 
-  // Split the text into tokens for precise matching
   let tokens = [text];
 
-  // Iterate over sorted traits and replace matches with tooltip spans
   sortedTraits.forEach((trait) => {
     const tooltip = TRAIT_TOOLTIPS[trait];
-    const regex = new RegExp(`\\b${trait}\\b`, "gi"); // Match whole words/phrases
+    const regex = new RegExp(`\\b${trait}\\b`, "gi");
 
     tokens = tokens.flatMap((token) => {
       if (typeof token === "string") {
@@ -305,7 +301,15 @@ const highlightWithTooltips = (text) => {
                   className="border-b border-dashed border-gray-400 cursor-help"
                 >
                   {trait}
-                  <Tooltip id={`tooltip-${trait}`} />
+                  <Tooltip
+                    id={`tooltip-${trait}`}
+                    place="top" // Adjust position (e.g., top, bottom, left, right)
+                    style={{
+                      maxWidth: "90vw", // Constrain width on mobile
+                      whiteSpace: "normal", // Allow line breaks for longer text
+                      overflowWrap: "break-word", // Prevent text from breaking out
+                    }}
+                  />
                 </span>,
               ]
             : [part]
@@ -317,6 +321,7 @@ const highlightWithTooltips = (text) => {
 
   return <>{tokens}</>;
 };
+
 
 
   return (
