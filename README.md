@@ -1,6 +1,9 @@
-# Starlight
+# Starlight  
 
-https://starlight-eca2a.web.app/  
+[Live Demo](https://starlight-eca2a.web.app/)  
 
-Starlight is your go-to tool for exploring the Starlight setting and game system. 
+**Starlight** is a dedicated website for the *Starlight* tabletop roleplaying game system, inspired by *Dark Heresy 2nd Edition* by Fantasy Flight Games.  
 
+## Features  
+- **Item Wiki**: Easily browse, filter, search, and explore items with detailed tooltips and more.  
+- **Character Compendium**: Create and manage characters, including inventory tracking and customization tools.  
