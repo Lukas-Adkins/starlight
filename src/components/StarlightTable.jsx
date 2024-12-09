@@ -167,8 +167,8 @@ const renderFields = (item, fields) => {
     // Skip empty or undefined fields
     if (!item[field] || item[field] === "N/A") return null;
 
-    // Special case for 'Description'
-    if (field === "Description" || field === "Special / Notes") {
+    // Special case for 'Special / Notes'
+    if (field === "Special / Notes") {
       const fieldValue =
         typeof item[field] === "string" ? item[field] : String(item[field]);
 
@@ -178,10 +178,27 @@ const renderFields = (item, fields) => {
           className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
         >
           <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
-          <DescriptionField text={highlightWithTooltips(fieldValue)} />
+          <DescriptionField text={fieldValue} enableTooltips={true} />
         </div>
       );
     }
+
+    // Handle 'Description' without tooltips
+    if (field === "Description") {
+      const fieldValue =
+        typeof item[field] === "string" ? item[field] : String(item[field]);
+
+      return (
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
+        >
+          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
+          <DescriptionField text={fieldValue} enableTooltips={false} />
+        </div>
+      );
+    }
+
 
     // Special case for 'URL'
     if (field === "Url") {
@@ -222,14 +239,21 @@ const renderFields = (item, fields) => {
 
 
 // Component for handling expandable/collapsible text
-const DescriptionField = ({ text }) => {
+const DescriptionField = ({ text, enableTooltips = false }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   const renderContent = () => {
     if (typeof text === "string") {
       const truncatedText =
         text.length > 300 ? text.slice(0, 300) + "..." : text;
-      return isExpanded ? highlightWithTooltips(text) : highlightWithTooltips(truncatedText);
+
+      if (enableTooltips) {
+        return isExpanded
+          ? highlightWithTooltips(text)
+          : highlightWithTooltips(truncatedText);
+      } else {
+        return isExpanded ? text : truncatedText;
+      }
     }
 
     // If `text` is already JSX, render it directly
@@ -250,6 +274,7 @@ const DescriptionField = ({ text }) => {
     </div>
   );
 };
+
 
 const highlightWithTooltips = (text) => {
   if (!ALLOWED_TOOLTIP_CATEGORIES.includes(activeCategory)) return text;
