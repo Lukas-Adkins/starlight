@@ -4,7 +4,10 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { Tooltip } from "react-tooltip";
 import {
+  TRAIT_TOOLTIPS,
+  ALLOWED_TOOLTIP_CATEGORIES,
   MAX_CACHE_SIZE,
   CATEGORIES,
   RARITY_ORDER,
@@ -151,6 +154,146 @@ const StarlightTable = () => {
     });
   }, [filteredItems]);  
 
+  
+const renderFields = (item, fields) => {
+
+  const reorderedFields = fields
+  .filter((field) => field !== "Special / Notes" && field !== "Description")
+  .concat(["Special / Notes", "Description"]);
+
+  return reorderedFields.map((field) => {
+    const fullFieldName = FULL_FIELD_NAMES[field] || field;
+
+    // Skip empty or undefined fields
+    if (!item[field] || item[field] === "N/A") return null;
+
+    // Special case for 'Description'
+    if (field === "Description" || field === "Special / Notes") {
+      const fieldValue =
+        typeof item[field] === "string" ? item[field] : String(item[field]);
+
+      return (
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
+        >
+          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
+          <DescriptionField text={highlightWithTooltips(fieldValue)} />
+        </div>
+      );
+    }
+
+    // Special case for 'URL'
+    if (field === "Url") {
+      return (
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
+        >
+          <strong className="text-gray-400">{fullFieldName}:</strong>
+          <a
+            href={item[field]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center"
+          >
+            Image <FaExternalLinkAlt className="ml-2" />
+          </a>
+        </div>
+      );
+    }
+
+    // Default field layout for other fields
+    return (
+      <div
+        key={field}
+        className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
+      >
+        <span className="font-semibold text-gray-400">{fullFieldName}:</span>
+        <span className="text-gray-100">
+          {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
+        </span>
+      </div>
+    );
+  });
+};
+
+
+
+
+// Component for handling expandable/collapsible text
+const DescriptionField = ({ text }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const renderContent = () => {
+    if (typeof text === "string") {
+      const truncatedText =
+        text.length > 300 ? text.slice(0, 300) + "..." : text;
+      return isExpanded ? highlightWithTooltips(text) : highlightWithTooltips(truncatedText);
+    }
+
+    // If `text` is already JSX, render it directly
+    return text;
+  };
+
+  return (
+    <div>
+      <div className="text-gray-200 leading-relaxed">{renderContent()}</div>
+      {typeof text === "string" && text.length > 300 && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 text-blue-500 hover:underline"
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+const highlightWithTooltips = (text) => {
+  if (!ALLOWED_TOOLTIP_CATEGORIES.includes(activeCategory)) return text;
+
+  if (typeof text !== "string") return text;
+
+  // Sort keys to prioritize longer phrases first
+  const sortedTraits = Object.keys(TRAIT_TOOLTIPS).sort((a, b) => b.length - a.length);
+
+  // Split the text into tokens for precise matching
+  let tokens = [text];
+
+  // Iterate over sorted traits and replace matches with tooltip spans
+  sortedTraits.forEach((trait) => {
+    const tooltip = TRAIT_TOOLTIPS[trait];
+    const regex = new RegExp(`\\b${trait}\\b`, "gi"); // Match whole words/phrases
+
+    tokens = tokens.flatMap((token) => {
+      if (typeof token === "string") {
+        return token.split(regex).flatMap((part, i, arr) =>
+          i < arr.length - 1
+            ? [
+                part,
+                <span
+                  key={`${trait}-${i}`}
+                  data-tooltip-id={`tooltip-${trait}`}
+                  data-tooltip-content={tooltip}
+                  className="border-b border-dashed border-gray-400 cursor-help"
+                >
+                  {trait}
+                  <Tooltip id={`tooltip-${trait}`} />
+                </span>,
+              ]
+            : [part]
+        );
+      }
+      return token;
+    });
+  });
+
+  return <>{tokens}</>;
+};
+
+
   return (
     <div className="container mx-auto px-4">
       {/* Search Bar and Dropdown */}
@@ -257,93 +400,5 @@ const StarlightTable = () => {
     </div>
   );
 };
-
-const renderFields = (item, fields) => {
-
-  const reorderedFields = fields
-  .filter((field) => field !== "Special / Notes" && field !== "Description")
-  .concat(["Special / Notes", "Description"]);
-
-  return reorderedFields.map((field) => {
-    const fullFieldName = FULL_FIELD_NAMES[field] || field;
-
-    // Skip empty or undefined fields
-    if (!item[field] || item[field] === "N/A") return null;
-
-    // Special case for 'Description'
-    if (field === "Description" || field === "Special / Notes") {
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
-        >
-          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
-          <DescriptionField text={item[field]} />
-        </div>
-      );
-    }
-
-    // Special case for 'URL'
-    if (field === "Url") {
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
-        >
-          <strong className="text-gray-400">{fullFieldName}:</strong>
-          <a
-            href={item[field]}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline flex items-center"
-          >
-            Image <FaExternalLinkAlt className="ml-2" />
-          </a>
-        </div>
-      );
-    }
-
-    // Default field layout for other fields
-    return (
-      <div
-        key={field}
-        className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
-      >
-        <span className="font-semibold text-gray-400">{fullFieldName}:</span>
-        <span className="text-gray-100">
-          {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
-        </span>
-      </div>
-    );
-  });
-};
-
-
-
-
-// Component for handling expandable/collapsible text
-const DescriptionField = ({ text }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-
-  const truncatedText = text.length > 300 ? text.slice(0, 300) + "..." : text;
-
-  return (
-    <div>
-      <p className="text-gray-200 leading-relaxed">
-        {isExpanded ? text : truncatedText}
-      </p>
-      {text.length > 300 && (
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 text-blue-500 hover:underline"
-        >
-          {isExpanded ? "Read Less" : "Read More"}
-        </button>
-      )}
-    </div>
-  );
-};
-
-
 
 export default StarlightTable;

@@ -93,3 +93,50 @@ export const CUSTOM_TYPE_ORDER = [
   export const CATEGORIES = {
     "types": ["Ranged Weapon", "Melee Weapon", "Miscellaneous", "Armor", "Consumable", "Cybernetic", "Explosive", "Mech", "Mech Engine", "Mech Melee Weapon", "Mech Ranged Weapon", "Mech Utility", "Special Ammo", "Weapon Mod"]
   }
+
+  export const TRAIT_TOOLTIPS = {
+    Accurate: "+10 to hit with Aim; Basic weapons gain +1d10 damage per 2 DoS (max +2d10) on single shot.",
+    Balanced: "+10 to Parry tests.",
+    Blast: "Hits all in radius; roll damage individually.",
+    Concussive: "Target tests Toughness with -10 per level; failure stuns per DoF.",
+    Corrosive: "Armor reduced by 1d10; excess damage applies directly.",
+    Crippling: "Taking more than a half action deals damage per level, ignoring armor.",
+    Defensive: "+15 to Parry, -10 to hit when attacking.",
+    Felling: "Reduces target's Unnatural Toughness bonus by level.",
+    Flame: "Fail Agility test to avoid being set on fire; fire deals 1d10 damage, 1 Fatigue per round.",
+    Flexible: "Cannot be parried.",
+    Nethari: "Bonus energy damage and Pen equal to Psi Rating; can deal extra damage with Focus Power.",
+    Hallucinogenic: "Fail Toughness test by level to roll on Hallucinogenic Effects table.",
+    EMP: "Disables unshielded tech in radius for 1d5 rounds; affects nearest mech systems.",
+    Inaccurate: "No aim bonus.",
+    Maximal: "Optional +10 range, +1d10 damage, +2 Pen, +2 Blast radius; uses triple ammo and adds Recharge.",
+    Overheats: "Roll 91+ deals Energy damage to arm and disables weapon for a round.",
+    Takedown: "Target must test Toughness or be Stunned and knocked prone.",
+    "Power Field": "On Parry, 26+ destroys enemy weapon (GM discretion).",
+    Proven: "Damage dice roll no lower than set minimum.",
+    "RazorS harp": "Double Pen with 3+ DoS.",
+    Recharge: "Cannot attack again until next round.",
+    Reliable: "Jams only on 100.",
+    Scatter: "+10 to hit and +3 damage at Point Blank; -3 damage at long range.",
+    Shocking: "Fail Toughness test to gain Fatigue and be Stunned for level rounds.",
+    Shield: "Adds AP to body and arm.",
+    Smoke: "Creates smoke cloud lasting 1d10+10 rounds.",
+    Snare: "Fail Agility test to be Immobilized, requiring another test to escape.",
+    Spray: "Hits all in a 30° cone; targets test Agility to avoid.",
+    Storm: "Doubles hits and ammo use.",
+    Tearing: "Roll extra damage die; discard lowest.",
+    Toxic: "Fail Toughness test by level to take 1d10 extra damage.",
+    Unbalanced: "-10 to Parry; no lightning attack.",
+    Unreliable: "Jams on 91+.",
+    Unwieldy: "Cannot Parry or make lightning attacks.",
+    Vengeful: "Additional critical hit value.",
+    Oxygen: "Provides breathable oxygen for a set number of hours.",
+    "Self-Sealing": "Nanomachines repair damage to maintain pressurization.",
+    "EMP Shield": "Immune to EMP effects.",
+    "RCS Controls": "Allows free maneuvering in 0 g up to half movement speed.",
+    "Thermal Sight": "Negates sight penalties from smoke or darkness.",
+    "Air Filtration": "Grants immunity to gas or air-based hazards.",
+    Autodoctor: "Onboard AI ensures wearer is Lightly Damaged for healing; injects drugs as needed."
+  };
+
+  export const ALLOWED_TOOLTIP_CATEGORIES = ["Ranged Weapon", "Melee Weapon", "Armor", "Explosive", "Special Ammo", "Mech Ranged Weapon", "Mech Melee Weapon","Mech Utility" ];
