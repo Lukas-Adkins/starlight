@@ -136,7 +136,8 @@ export const CUSTOM_TYPE_ORDER = [
     "RCS Controls": "Allows free maneuvering in 0 g up to half movement speed.",
     "Thermal Sight": "Negates sight penalties from smoke or darkness.",
     "Air Filtration": "Grants immunity to gas or air-based hazards.",
-    Autodoctor: "Onboard AI ensures wearer is Lightly Damaged for healing; injects drugs as needed."
+    Autodoctor: "Onboard AI ensures wearer is Lightly Damaged for healing; injects drugs as needed.",
+    Compact: "-20 to tests made to find."
   };
 
   export const ALLOWED_TOOLTIP_CATEGORIES = ["Ranged Weapon", "Melee Weapon", "Armor", "Explosive", "Special Ammo", "Mech Ranged Weapon", "Mech Melee Weapon","Mech Utility" ];
