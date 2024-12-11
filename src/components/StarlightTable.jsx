@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence} from "framer-motion";
 import { Tooltip } from "react-tooltip";
 import {
   TRAIT_TOOLTIPS,
@@ -27,16 +27,18 @@ const formatPrice = (price) => {
 
 const useBodyScrollLock = (isLocked) => {
   useEffect(() => {
+    const body = document.body;
     if (isLocked) {
-      document.body.classList.add("overflow-hidden");
+      body.style.transition = "overflow 0.3s ease";
+      body.classList.add("overflow-hidden");
     } else {
-      document.body.classList.remove("overflow-hidden");
+      body.style.transition = "overflow 0.3s ease";
+      body.classList.remove("overflow-hidden");
     }
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
+    return () => body.classList.remove("overflow-hidden");
   }, [isLocked]);
 };
+
 
 const StarlightTable = () => {
   const categories = [...CATEGORIES.types.sort((a, b) => {
@@ -101,7 +103,7 @@ const StarlightTable = () => {
   
   const ItemCard = React.memo(({ item, onSelect }) => {
     return (
-      <div
+      <motion.div
         key={item.id}
         className="bg-gray-800 p-4 rounded shadow hover:shadow-lg hover:bg-gray-700 cursor-pointer flex justify-between transition-transform transform hover:scale-105"
         onClick={() => onSelect(item)}
@@ -126,7 +128,7 @@ const StarlightTable = () => {
             {item.Price ? `₵${formatPrice(item.Price)}` : "Price: N/A"}
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   });  
 
@@ -336,6 +338,8 @@ const highlightWithTooltips = (text) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            whileFocus={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
           />
         </div>
         <div>
@@ -343,6 +347,8 @@ const highlightWithTooltips = (text) => {
             value={activeCategory}
             onChange={(e) => setActiveCategory(e.target.value)}
             className="p-2 bg-gray-800 border border-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            whileFocus={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -367,68 +373,80 @@ const highlightWithTooltips = (text) => {
       ) : sortedItems.length === 0 ? (
         <p className="text-gray-400 text-center">No items match your search or category.</p>
       ) : (
-        // MEMO
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {sortedItems.map((item) => (
-            <ItemCard key={item.id} item={item} onSelect={setSelectedItem} />
-          ))}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory} // Unique key for re-render
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {sortedItems.map((item) => (
+              <ItemCard key={item.id} item={item} onSelect={setSelectedItem} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
       )}
+
 
       {/* Modal */}
       {selectedItem && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
-          onClick={() => setSelectedItem(null)}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div
-            className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative max-h-screen overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+        <AnimatePresence>
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
+            onClick={() => setSelectedItem(null)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
-              aria-label="Close"
+            <div
+              className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative max-h-screen overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
             >
-              ✕
-            </button>
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
+                aria-label="Close"
+              >
+                ✕
+              </button>
 
-            {/* Item Name */}
-            <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
+              {/* Item Name */}
+              <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
 
-            {/* Item Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {renderFields(
-                selectedItem,
-                FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
-              ).map((field, index) =>
-                field ? (
-                  React.isValidElement(field) &&
-                  (field.key === "Description" || field.key === "Special / Notes") ? (
-                    // Wide fields (e.g., Description)
-                    <div key={index} className="col-span-1 sm:col-span-2">
-                      {field}
-                    </div>
-                  ) : (
-                    // Regular fields
-                    <div key={index} className="col-span-1">
-                      {field}
-                    </div>
-                  )
-                ) : null
-              )}
+              {/* Item Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {renderFields(
+                  selectedItem,
+                  FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
+                ).map((field, index) =>
+                  field ? (
+                    React.isValidElement(field) &&
+                    (field.key === "Description" || field.key === "Special / Notes") ? (
+                      // Wide fields (e.g., Description)
+                      <div key={index} className="col-span-1 sm:col-span-2">
+                        {field}
+                      </div>
+                    ) : (
+                      // Regular fields
+                      <div key={index} className="col-span-1">
+                        {field}
+                      </div>
+                    )
+                  ) : null
+                )}
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </AnimatePresence>
       )}
-
     </div>
+    
   );
+  
 };
 
 export default StarlightTable;
