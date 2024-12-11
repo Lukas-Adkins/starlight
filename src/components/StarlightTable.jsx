@@ -361,19 +361,40 @@ const highlightWithTooltips = (text) => {
 
       {isError && <p className="text-red-500">Error loading items. Please try again later.</p>}
 
-      {isFetching ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array(8).fill().map((_, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded animate-pulse">
-              <div className="h-4 bg-gray-500 rounded mb-2"></div>
-              <div className="h-3 bg-gray-600 rounded w-3/4"></div>
-            </div>
-          ))}
-        </div>
-      ) : sortedItems.length === 0 ? (
-        <p className="text-gray-400 text-center">No items match your search or category.</p>
-      ) : (
-        <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
+        {isFetching ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {Array(8)
+              .fill()
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-700 p-4 rounded animate-pulse"
+                >
+                  <div className="h-4 bg-gray-500 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-600 rounded w-3/4"></div>
+                </div>
+              ))}
+          </motion.div>
+        ) : sortedItems.length === 0 ? (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-gray-400 text-center"
+          >
+            No items match your search or category.
+          </motion.div>
+        ) : (
           <motion.div
             key={activeCategory} // Unique key for re-render
             initial={{ opacity: 0, y: 10 }}
@@ -386,8 +407,8 @@ const highlightWithTooltips = (text) => {
               <ItemCard key={item.id} item={item} onSelect={setSelectedItem} />
             ))}
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
 
 
       {/* Modal */}
