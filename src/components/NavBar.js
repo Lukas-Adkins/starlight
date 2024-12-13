@@ -51,14 +51,6 @@ const NavBar = () => {
               <ul className="py-2">
                 <li>
                   <Link
-                    to="/rulebook/introduction"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Introduction
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     to="/rulebook/character"
                     className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
                   >

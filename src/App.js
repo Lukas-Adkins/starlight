@@ -9,6 +9,8 @@ import Characters from "./components/CharacterSelection";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import StarlightTable from "./components/StarlightTable"
+import Rulebook from "./components/Rulebook";
+
 import './App.css';
 
 // Initialize React Query's QueryClient
@@ -43,6 +45,14 @@ function AnimatedRoutes() {
           element={
             <PageTransition>
               <Home />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/rulebook/:section"
+          element={
+            <PageTransition>
+              <Rulebook />
             </PageTransition>
           }
         />
