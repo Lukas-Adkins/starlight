@@ -4,7 +4,7 @@ import { RULEBOOK_DATA } from "../constants/rulebook";
 
 const Rulebook = () => {
   const { section } = useParams();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
   const navigate = useNavigate();
 
@@ -21,29 +21,109 @@ const Rulebook = () => {
   );
 
   const renderContent = () => {
-    if (!sectionData) return <p>Section not found.</p>;
-
-    // Handle structured sections (with `sections` array)
-    if (sectionData.sections) {
+    if (!sectionData) {
+      return <p>Section not found.</p>;
+    }
+  
+    // Check for `sections` array and render its content
+    if (Array.isArray(sectionData.sections)) {
       return sectionData.sections.map((sec, idx) => (
         <div key={idx} className="space-y-4">
           {sec.heading && (
-            <h3 className="text-xl font-semibold text-blue-400">
-              {sec.heading}
-            </h3>
+            <h3 className="text-xl font-semibold text-blue-400">{sec.heading}</h3>
           )}
-          {sec.content && <p className="text-gray-300">{sec.content}</p>}
+          {sec.content && (
+            <p className="text-gray-300 whitespace-pre-line">{sec.content}</p>
+          )}
+          {sec.table && (
+            <div className="overflow-x-auto mt-4">
+              <table className="w-full text-gray-300">
+                <thead>
+                  <tr>
+                    {sec.table.columns.map((col, colIdx) => (
+                      <th
+                        key={colIdx}
+                        className="sticky top-0 border-b border-gray-600 px-4 py-2 text-left bg-gray-800"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sec.table.rows.map((row, rowIdx) => (
+                    <tr
+                      key={rowIdx}
+                      className={rowIdx % 2 === 0 ? "bg-gray-800" : "bg-gray-700"}
+                    >
+                      <td className="border-b border-gray-600 px-4 py-2">
+                        {row.crit}
+                      </td>
+                      <td className="border-b border-gray-600 px-4 py-2">
+                          {row.effect.length > 500
+                            ? `${row.effect.slice(0, 500)}...`
+                            : row.effect}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       ));
     }
-
-    // Handle plain string content
+  
+    // Check for plain string content
     if (typeof sectionData === "string") {
       return <p className="text-gray-300 whitespace-pre-line">{sectionData}</p>;
     }
-
+  
+    // Check for standalone `table` data
+    if (sectionData.table) {
+      return (
+        <div className="overflow-x-auto">
+          <table className="w-full text-gray-300">
+            <thead>
+              <tr>
+                {sectionData.table.columns.map((col, idx) => (
+                  <th
+                    key={idx}
+                    className="sticky top-0 border-b border-gray-600 px-4 py-2 text-left bg-gray-800"
+                  >
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sectionData.table.rows.map((row, idx) => (
+                <tr
+                  key={idx}
+                  className={idx % 2 === 0 ? "bg-gray-800" : "bg-gray-700"}
+                >
+                  <td className="border-b border-gray-600 px-4 py-2">{row.crit}</td>
+                  <td className="border-b border-gray-600 px-4 py-2">
+                    <span title={row.effect}>
+                      {row.effect.length > 50
+                        ? `${row.effect.slice(0, 50)}...`
+                        : row.effect}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+  
+    // Fallback for invalid formats
     return <p>Invalid section format.</p>;
   };
+  
+  
+  
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-gray-100">
@@ -56,31 +136,6 @@ const Rulebook = () => {
         <h2 className="text-lg font-bold text-gray-300 mb-4">
           Table of Contents
         </h2>
-
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 pl-10 border border-gray-700 rounded-md bg-gray-900 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <svg
-            className="absolute top-1/2 left-3 transform -translate-y-1/2 h-5 w-5 text-gray-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M21 21l-4.35-4.35M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"
-            />
-          </svg>
-        </div>
 
         <ul className="space-y-2">
           {filteredSections.map((key) => (

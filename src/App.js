@@ -51,9 +51,9 @@ function AnimatedRoutes() {
         <Route
           path="/rulebook/:section"
           element={
-            <PageTransition>
+            <PageFastTransition>
               <Rulebook />
-            </PageTransition>
+            </PageFastTransition>
           }
         />
         <Route
@@ -104,6 +104,23 @@ function PageTransition({ children }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function PageFastTransition({ children }) {
+  return (
+    <motion.div
+      key={children.key} // Ensures proper animation between transitions
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 10 }}
+      transition={{
+        duration: 0.2, // Fast duration for immediate feedback
+        ease: "easeInOut", // Smooth entry and exit
+      }}
     >
       {children}
     </motion.div>
