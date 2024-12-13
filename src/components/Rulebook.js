@@ -36,40 +36,49 @@ const Rulebook = () => {
             <p className="text-gray-300 whitespace-pre-line">{sec.content}</p>
           )}
           {sec.table && (
-            <div className="overflow-x-auto mt-4">
-              <table className="w-full text-gray-300">
-                <thead>
-                  <tr>
-                    {sec.table.columns.map((col, colIdx) => (
-                      <th
-                        key={colIdx}
-                        className="sticky top-0 border-b border-gray-600 px-4 py-2 text-left bg-gray-800"
-                      >
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {sec.table.rows.map((row, rowIdx) => (
-                    <tr
-                      key={rowIdx}
-                      className={rowIdx % 2 === 0 ? "bg-gray-800" : "bg-gray-700"}
-                    >
-                      <td className="border-b border-gray-600 px-4 py-2">
-                        {row.crit}
-                      </td>
-                      <td className="border-b border-gray-600 px-4 py-2">
-                          {row.effect.length > 500
-                            ? `${row.effect.slice(0, 500)}...`
-                            : row.effect}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+  <div className="overflow-x-auto mt-4 shadow-lg rounded-lg">
+    <table className="w-full border-collapse text-gray-300 border border-gray-600">
+      <thead>
+        <tr className="bg-gray-800 text-white">
+          {sec.table.columns.map((col, colIdx) => (
+            <th
+              key={colIdx}
+              className="px-4 py-3 text-left font-semibold tracking-wide border-b border-gray-600 bg-gradient-to-r from-gray-900 to-gray-800 rounded-t-lg"
+            >
+              {col}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {sec.table.rows.map((row, rowIdx) => (
+          <tr
+            key={rowIdx}
+            className={`${
+              rowIdx % 2 === 0 ? "bg-gray-800" : "bg-gray-700"
+            } hover:bg-gray-600 transition duration-300 ease-in-out`}
+          >
+            <td
+              className="border-b border-gray-600 px-4 py-2 rounded-lg break-words whitespace-normal"
+            >
+              {row.crit}
+            </td>
+            <td
+              className="border-b border-gray-600 px-4 py-2 rounded-lg break-words whitespace-normal"
+            >
+              {row.effect}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+
+
+
+
         </div>
       ));
     }
