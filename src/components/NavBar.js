@@ -25,7 +25,7 @@ const NavBar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gray-800 p-4 shadow-md">
+    <header className="bg-gray-800 p-4 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left Side: Home Icon + Feature Links */}
         <div className="flex items-center space-x-6">
@@ -46,75 +46,7 @@ const NavBar = () => {
             >
               Rulebook
             </Link>
-            {/* Dropdown Menu */}
-            <div className="absolute hidden group-hover:flex bg-gray-700 shadow-lg top-full mt-1 rounded-lg w-48 z-10">
-              <ul className="py-2">
-                <li>
-                  <Link
-                    to="/rulebook/character"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Character
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/gear"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Gear
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/mechs"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Mechs
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/personal-combat"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Personal Combat
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/talents-traits"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Talents and Traits
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/elite-advances"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Elite Advances
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/psionics"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Psionics
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/rulebook/critical-damage"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-600 transition"
-                  >
-                    Critical Damage
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            
           </div>
 
           {/* Items Page Link */}

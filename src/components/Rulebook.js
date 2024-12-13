@@ -1,113 +1,71 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
-// Example rulebook data
-const rulebookData = {
-  introduction: `
-    Welcome to the rulebook. This section introduces the game system, its core concepts, and how players interact with the world. 
-    Be ready for an exciting journey into a richly detailed universe!
-  `,
-  character: `
-    Characters are the heart of any adventure. Build your character by choosing attributes, skills, and abilities.
-    Use the table below to allocate your starting points:
-  `,
-  gear: `
-    Gear helps your characters survive and thrive. From swords to futuristic blasters, gear matters!
-    Here's an example of item stats:
-  `,
-  mechs: `
-    Mechs are powerful machines piloted by characters. Choose your model and customize it with weapons, shields, and upgrades.
-    See the mech specs table for an overview:
-  `,
-  "personal-combat": `
-    Engage in thrilling personal combat scenarios. Use the rules below to determine attack outcomes.
-  `,
-  "talents-traits": `
-    Talents and traits define your character’s unique capabilities. Choose wisely to craft a balanced or specialized adventurer.
-  `,
-  "elite-advances": `
-    Elite advances are for experienced characters ready to face the toughest challenges.
-  `,
-  psionics: `
-    Psionics allow characters to wield mental powers. Master these abilities to outsmart your foes and overcome obstacles.
-  `,
-  "critical-damage": `
-    Critical damage can change the course of a battle. Learn how to deal and survive devastating blows.
-  `,
-};
-
-const sampleTables = {
-  character: [
-    { Attribute: "Strength", Points: 10 },
-    { Attribute: "Dexterity", Points: 8 },
-    { Attribute: "Intelligence", Points: 12 },
-  ],
-  gear: [
-    { Item: "Longsword", Damage: "1d8", Cost: "50gp" },
-    { Item: "Blaster", Damage: "2d6", Cost: "200gp" },
-  ],
-  mechs: [
-    { Model: "Titan", Armor: "100", Speed: "40" },
-    { Model: "Hawk", Armor: "80", Speed: "60" },
-  ],
-};
+import { RULEBOOK_DATA } from "../constants/rulebook";
 
 const Rulebook = () => {
   const { section } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
   const navigate = useNavigate();
 
-  const content = rulebookData[section?.toLowerCase()] || "Section not found.";
+  // Determine the content for the current section
+  const sectionData = RULEBOOK_DATA[section?.toLowerCase()];
 
-  const filteredSections = Object.keys(rulebookData).filter(
+  // Filter sections based on search term
+  const filteredSections = Object.keys(RULEBOOK_DATA).filter(
     (key) =>
       key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rulebookData[key].toLowerCase().includes(searchTerm.toLowerCase())
+      (RULEBOOK_DATA[key]?.title || key)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
-  const renderTable = () => {
-    const tableData = sampleTables[section?.toLowerCase()];
-    if (!tableData) return null;
+  const renderContent = () => {
+    if (!sectionData) return <p>Section not found.</p>;
 
-    return (
-      <table className="w-full mt-4 bg-gray-700 text-gray-300 rounded-md">
-        <thead>
-          <tr className="bg-gray-800">
-            {Object.keys(tableData[0]).map((header) => (
-              <th key={header} className="px-4 py-2 text-left">
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, idx) => (
-            <tr key={idx} className="border-t border-gray-600">
-              {Object.values(row).map((value, colIdx) => (
-                <td key={colIdx} className="px-4 py-2">
-                  {value}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
+    // Handle structured sections (with `sections` array)
+    if (sectionData.sections) {
+      return sectionData.sections.map((sec, idx) => (
+        <div key={idx} className="space-y-4">
+          {sec.heading && (
+            <h3 className="text-xl font-semibold text-blue-400">
+              {sec.heading}
+            </h3>
+          )}
+          {sec.content && <p className="text-gray-300">{sec.content}</p>}
+        </div>
+      ));
+    }
+
+    // Handle plain string content
+    if (typeof sectionData === "string") {
+      return <p className="text-gray-300 whitespace-pre-line">{sectionData}</p>;
+    }
+
+    return <p>Invalid section format.</p>;
   };
 
   return (
-    <div className="bg-gray-900 text-gray-100 min-h-screen">
-      {/* Search Bar */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="relative max-w-lg mx-auto">
+    <div className="flex min-h-screen bg-gray-900 text-gray-100">
+      {/* Sidebar */}
+      <aside
+        className={`fixed top-0 left-0 w-64 bg-gray-800 p-4 h-full z-40 transition-transform transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 lg:sticky lg:top-16`}
+      >
+        <h2 className="text-lg font-bold text-gray-300 mb-4">
+          Table of Contents
+        </h2>
+
+        {/* Search Bar */}
+        <div className="relative mb-4">
           <input
             type="text"
-            placeholder="Search the rulebook..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-10 border border-gray-700 rounded-md bg-gray-800 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 pl-10 border border-gray-700 rounded-md bg-gray-900 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {/* Search Icon */}
           <svg
             className="absolute top-1/2 left-3 transform -translate-y-1/2 h-5 w-5 text-gray-500"
             xmlns="http://www.w3.org/2000/svg"
@@ -122,56 +80,48 @@ const Rulebook = () => {
               d="M21 21l-4.35-4.35M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"
             />
           </svg>
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
-            >
-              ✕
-            </button>
-          )}
-          {searchTerm && (
-            <ul className="absolute w-full bg-gray-800 mt-2 shadow-md rounded-lg z-10">
-              {filteredSections.length ? (
-                filteredSections.map((key) => (
-                  <li key={key}>
-                    <button
-                      onClick={() => {
-                        setSearchTerm(""); // Clear the search term
-                        navigate(`/rulebook/${key.toLowerCase()}`); // Navigate to the section
-                      }}
-                      className="block px-4 py-2 hover:bg-gray-700 text-gray-300 w-full text-left"
-                    >
-                      {key}
-                    </button>
-                  </li>
-                ))
-              ) : (
-                <li className="px-4 py-2 text-gray-500">No matches found</li>
-              )}
-            </ul>
-          )}
         </div>
-      </div>
-  
+
+        <ul className="space-y-2">
+          {filteredSections.map((key) => (
+            <li key={key}>
+              <button
+                onClick={() => {
+                  setIsSidebarOpen(false); // Close sidebar on selection
+                  navigate(`/rulebook/${key.toLowerCase()}`);
+                }}
+                className={`block w-full text-left px-4 py-2 rounded-md ${
+                  section?.toLowerCase() === key.toLowerCase()
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-900 hover:bg-gray-700 text-gray-300"
+                }`}
+              >
+                {RULEBOOK_DATA[key]?.title || key}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      {/* Sidebar Toggle for Mobile */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 text-gray-100 p-2 rounded-md"
+      >
+        {isSidebarOpen ? "Close" : "Menu"}
+      </button>
+
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <main className="flex-1 lg: p-8">
         <div className="bg-gray-800 p-8 shadow-md rounded-lg">
-          {/* Title */}
           <h2 className="text-3xl font-bold mb-6 capitalize text-center">
-            {section || "Rulebook"}
+            {sectionData?.title || "Rulebook"}
           </h2>
-  
-          {/* Content */}
-          <p className="leading-relaxed text-gray-300">{content}</p>
-  
-          {/* Table */}
-          {renderTable()}
+          <div className="leading-relaxed space-y-6">{renderContent()}</div>
         </div>
-      </div>
+      </main>
     </div>
   );
-  
 };
 
 export default Rulebook;
