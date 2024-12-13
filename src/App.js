@@ -113,13 +113,13 @@ function PageTransition({ children }) {
 function PageFastTransition({ children }) {
   return (
     <motion.div
-      key={children.key} // Ensures proper animation between transitions
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10 }}
+      key={children?.key || "default-transition-key"} // Fallback for missing keys
+      initial={{ opacity: 0, translateX: -10 }} // Use GPU-accelerated transform
+      animate={{ opacity: 1, translateX: 0 }}
+      exit={{ opacity: 0, translateX: 10 }}
       transition={{
-        duration: 0.2, // Fast duration for immediate feedback
-        ease: "easeInOut", // Smooth entry and exit
+        duration: 0.25, // Slightly slower for better perception
+        ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for a smoother curve
       }}
     >
       {children}
