@@ -49,20 +49,31 @@ const StarlightTable = () => {
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [setCategoryCache] = useState({});
 
   useBodyScrollLock(!!selectedItem);
 
   const fetchItemsByCategory = async (category) => {
     const cacheKey = `categoryCache_${category}`; // Unique key for each category
-  
-    // Check if data exists in localStorage
     const cachedData = localStorage.getItem(cacheKey);
+    const now = Date.now(); // Current timestamp
+
+  
     if (cachedData) {
-      return JSON.parse(cachedData); // Return parsed data if available
+      try {
+        const parsedData = JSON.parse(cachedData);
+  
+        // Check if timestamp exists and if the cache is still valid
+        if (parsedData.timestamp && now - parsedData.timestamp < MAX_CACHE_SIZE) {
+          return parsedData.items; // Return valid cached items
+        }
+  
+        // If no timestamp or cache is stale, fall through to fetch fresh data
+      } catch (error) {
+        console.error("Error parsing cached data, fetching fresh data:", error);
+      }
     }
   
-    // Fetch from Firestore if not in localStorage
+    // Fetch fresh data from Firestore
     const queryConstraints = [where("Type", "==", category === "Miscellaneous" ? "Misc" : category)];
     const itemsQuery = query(collection(db, COLLECTION_NAME), ...queryConstraints);
     const snapshot = await getDocs(itemsQuery);
@@ -76,20 +87,11 @@ const StarlightTable = () => {
       };
     });
   
-    // Save the result to localStorage
-    localStorage.setItem(cacheKey, JSON.stringify(items));
-  
-    // Optionally, update in-memory cache
-    setCategoryCache((prevCache) => {
-      const newCache = { ...prevCache, [category]: items };
-  
-      // Limit cache size
-      if (Object.keys(newCache).length > MAX_CACHE_SIZE) {
-        delete newCache[Object.keys(newCache)[0]]; // Remove the oldest entry
-      }
-  
-      return newCache;
-    });
+    // Save the result to localStorage with a timestamp
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ timestamp: now, items })
+    );
   
     return items;
   };  
