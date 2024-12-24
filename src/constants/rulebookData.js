@@ -383,7 +383,7 @@ export const CRITICAL_DAMAGE_RENDING = {
   ],
 };
 
-export const CHARACTER = {
+export const CHARACTER_INFO = {
   title: "Character",
   sections: [
     {
@@ -419,7 +419,7 @@ export const CHARACTER = {
       content: "A character’s level of stress represents their level of mental fatigue. Stress may be given to characters by the GM. Players may additionally opt to take stress to perform a number of actions as seen on Table 2a. A character’s stress threshold is equal to 10 times their Willpower bonus. A full night of sleep removes 1d10 stress. A wakeful day of downtime removes approximately 1d10 stress. Indulging in a character’s vices can additionally reduce stress at the GM’s discretion. If a character pushes above their stress threshold (for example, 31/30), they immediately suffer a -10 to all rolls. They gain an additional -10 to all rolls for each 10 Stress taken above that character’s threshold (for example, 41/30 would net a -20). If a character reaches double their stress threshold, they die."
     },
     {
-      heading: "Table 1a. Characteristic Aptitudes",
+      heading: "Characteristic Aptitudes",
       table: {
         columns: ["Characteristic", "Aptitude 1", "Aptitude 2"],
         rows: [
@@ -437,7 +437,7 @@ export const CHARACTER = {
       }
     },
     {
-      heading: "Table 1b. Characteristic Costs",
+      heading: "Characteristic Costs",
       table: {
         columns: [
           "Num. of Aptitudes",
@@ -455,7 +455,7 @@ export const CHARACTER = {
       }
     },
     {
-      heading: "Table 1c. Skill Aptitudes",
+      heading: "Skill Aptitudes",
       table: {
         columns: ["Skill", "Aptitude 1", "Aptitude 2"],
         rows: [
@@ -488,7 +488,7 @@ export const CHARACTER = {
       }
     },
     {
-      heading: "Table 1d. Skill Advances",
+      heading: "Skill Advances",
       table: {
         columns: [
           "Number of Aptitudes",
@@ -505,7 +505,7 @@ export const CHARACTER = {
       }
     },
     {
-      heading: "Table 1e. Talent Advances",
+      heading: "Talent Advances",
       table: {
         columns: ["Number of Aptitudes", "Tier 1", "Tier 2", "Tier 3"],
         rows: [
@@ -514,23 +514,247 @@ export const CHARACTER = {
           { numApt: "Zero", tier1: "600xp", tier2: "900xp", tier3: "1200xp" }
         ]
       }
-    }
+    },
+    {
+      heading: "Stress Abilities",
+      table: {
+          columns: ["Cost", "Action"],
+          rows: [
+              { Cost: "10", Action: "Cheat death (permanently reduces stress threshold)" },
+              { Cost: "10", Action: "Reroll a failed test" },
+              { Cost: "5", Action: "Add +10 to a test before rolling" },
+              { Cost: "4", Action: "Add a degree of success to a roll" },
+              { Cost: "8", Action: "Automatically roll a 10 on initiative" },
+              { Cost: "10", Action: "Reduce the result of critical damage by 1d5" },
+              { Cost: "5", Action: "Remove 1 round of being Stunned" },
+              { Cost: "5", Action: "Remove 1 level of fatigue" },
+              { Cost: "10", Action: "Ignore fatigue for an hour" },
+          ],
+      },
+    },
   ]
 };
 
+export const TRAIT_INFO = {
+  title: "Traits",
+  sections: [
+      {
+          heading: "Weapon Traits",
+          table: {
+              columns: ["Trait", "Effect"],
+              rows: [
+                  { Trait: "Accurate", Effect: "Grants +10 Bonus to hit if used with Aim, Basic weapons add +1d10 damage per two extra DoS (max +2d10) when firing a single shot." },
+                  { Trait: "Balanced", Effect: "+10 to Weapon Skill tests made to Parry." },
+                  { Trait: "Blast (X)", Effect: "All within the weapon's blast radius in meters are hit. Roll damage individually for each character affected." },
+                  { Trait: "Concussive (X)", Effect: "On hit, the target must make a Toughness test (Operate test if piloting a mech) with a penalty equal to 10*(X). On failure, the target is stunned for one round per degree of failure." },
+                  { Trait: "Corrosive", Effect: "When hit, armor points in the hit location are reduced by 1d10 points. Any excess damage is dealt to the target. +0 Hardware test to repair." },
+                  { Trait: "Compact", Effect: "-20 to tests made to find this weapon." },
+                  { Trait: "Crippling (X)", Effect: "When wounded, the target is Crippled. Taking more than a half action on a turn results in immediate X damage not reduced by armor or toughness." },
+                  { Trait: "Defensive", Effect: "Grants +15 bonus to Parry and -10 penalty to hit when using this weapon." },
+                  { Trait: "Felling (X)", Effect: "When calculating damage, reduce the target's Unnatural Toughness bonus by X." },
+                  { Trait: "Flame", Effect: "Target must make a +0 Agility test or be set on fire, even if they take no damage from the attack. Fire causes 1d10 E damage and 1 Fatigue each round until extinguished." },
+                  { Trait: "Flexible", Effect: "Cannot be parried." },
+                  { Trait: "Nethari", Effect: "Weapon deals bonus energy damage and penetration equal to the user’s Psi Rating. May deal additional 1d10 Energy damage per DoS, ignoring armor and toughness bonus." },
+                  { Trait: "Hallucinogenic (X)", Effect: "Target must make a Toughness test with a penalty of 10*(X). On failure, roll 1d10 on the Hallucinogenic Effects table. Effect lasts for 1 round plus 1 per DoF." },
+                  { Trait: "EMP (X)", Effect: "Weapon generates an electromagnetic pulse field with radius (X) where unshielded technology ceases to function for 1d5 rounds. Mechs affected lose (X) Core Systems." },
+                  { Trait: "Inaccurate", Effect: "No benefit from the aim action." },
+                  { Trait: "Maximal", Effect: "Switch to Maximal fire mode as a free action. Adds range, damage, and penetration but consumes 3x ammo and gains Recharge quality." },
+                  { Trait: "Overheats", Effect: "On a roll of 91 or higher, the wielder takes Energy damage equivalent to the weapon's damage. Weapon may not be fired next round as it cools." },
+                  { Trait: "Takedown", Effect: "On a hit with damage, the opponent must make a +0 Toughness test or be Stunned for 1 round and knocked prone." },
+                  { Trait: "Power Field", Effect: "On a successful Parry, roll 1d100. On a result of 26+, the opposing weapon is destroyed." },
+                  { Trait: "Proven (X)", Effect: "Weapon's damage dice never count as rolling lower than (X)." },
+                  { Trait: "Razor Sharp", Effect: "On a successful hit with 3+ DoS, the penetration is doubled for that attack." },
+                  { Trait: "Recharge", Effect: "Attack cannot be used again until the end of the next round." },
+                  { Trait: "Reliable", Effect: "Weapon only jams on a 100 die roll." },
+                  { Trait: "Scatter", Effect: "At Point Blank, weapon gains +10 to hit and +3 to damage. At longer ranges, suffers -3 damage." },
+                  { Trait: "Shocking (X)", Effect: "On hit, target must make a +0 Toughness test. Failure causes Fatigue and Stun for (X) rounds. Disables mech Core Systems for (X) rounds." },
+                  { Trait: "Shield (X)", Effect: "Grants (X) AP to the body and arm on which the shield is held." },
+                  { Trait: "Smoke (X)", Effect: "Creates smoke cloud with radius (X) meters lasting 1d10+10 rounds." },
+                  { Trait: "Snare (X)", Effect: "Hit target must pass an Agility test with penalty (10*X) or be Immobilized. Immobilized targets can only escape with tests against same penalty." },
+                  { Trait: "Spray", Effect: "Weapon projects a 30-degree cone. All creatures in path must make an Agility test or be struck." },
+                  { Trait: "Storm", Effect: "Doubles number of hits inflicted and ammo expended." },
+                  { Trait: "Tearing", Effect: "Roll one extra die for damage, discard the lowest die." },
+                  { Trait: "Toxic (X)", Effect: "Targets hit must pass a Toughness test with penalty (10*X) or take additional damage. Ineffective against mechs." },
+                  { Trait: "Unbalanced", Effect: "Cannot use lightning attack. -10 to Parry." },
+                  { Trait: "Unreliable", Effect: "Weapon jams on a roll of 91 or higher." },
+                  { Trait: "Unwieldy", Effect: "Cannot be used to parry or make lightning attacks." },
+                  { Trait: "Vengeful", Effect: "Inflicts a critical hit on damage rolls of X or higher." }
+              ],
+          },
+      },
+      {
+          heading: "Armor Traits",
+          table: {
+              columns: ["Trait", "Effect"],
+              rows: [
+                  { Trait: "Oxygen (X)", Effect: "Armor has breathable oxygen supply for X hours." },
+                  { Trait: "Self-Sealing", Effect: "Automatically repairs damage that would cause depressurization." },
+                  { Trait: "EMP Shield", Effect: "Immune to EMP effects." },
+                  { Trait: "RCS Controls", Effect: "Allows free movement up to half speed in zero gravity." },
+                  { Trait: "Thermal Sight", Effect: "Negates penalties to sight from smoke or darkness." },
+                  { Trait: "Air Filtration", Effect: "Immune to gas-based or air hazard attacks." },
+                  { Trait: "Autodoctor", Effect: "Onboard AI keeps wearer alive with drugs. Always treated as Lightly Damaged for healing purposes." }
+              ],
+          },
+      },
+      {
+          heading: "Character and Mech Traits",
+          table: {
+              columns: ["Trait", "Effect"],
+              rows: [
+                  { Trait: "Baschet-Stratis Carrier", Effect: "Gain Psychic aptitude and Sense skill." },
+                  { Trait: "Baschet-Stratis Host", Effect: "Allows purchase of Baschet-Stratis Psionic Abilities." },
+                  { Trait: "Derelict", Effect: "Attacks on this mech gain Vengeful (8)." },
+                  { Trait: "Dual-Piloting System", Effect: "Two pilots can share three Half Actions per turn." },
+                  { Trait: "EMP Shielded", Effect: "Unaffected by EMP weapon trait." },
+                  { Trait: "Fear (X)", Effect: "Opponents must pass Willpower test against Fear rating or suffer Shock effects." },
+                  { Trait: "Maneuverable", Effect: "Grants an extra Dodge or Parry attempt per round." },
+                  { Trait: "Reinforced Servos (X)", Effect: "Weapon slots at (X) location can mount heavier weapons." },
+                  { Trait: "Run-down", Effect: "Attacks on this mech gain Vengeful (9)." },
+                  { Trait: "Self-Destruct System", Effect: "Pilot may initiate a self-destruct sequence as a Half Action." },
+                  { Trait: "Siliconian", Effect: "Cannot gain Baschet-Stratis Carrier or Host traits." },
+                  { Trait: "Size (X)", Effect: "Determines creature size and associated benefits or penalties." },
+                  { Trait: "Sturdy", Effect: "Grants +20 bonus to resist Grapple, Knock Down, and Takedown." },
+                  { Trait: "Swarm", Effect: "Cannot be killed by single-shot ranged or melee attacks. Can climb onto opponents during melee." },
+                  { Trait: "Unnatural Characteristic (X)", Effect: "Increases one Characteristic bonus by X." }
+              ],
+          },
+      }
+  ]
+};
 
+export const TALENT_INFO = {
+  title: "Talents",
+  sections: [
+      {
+          heading: "Tier 1 Talents",
+          table: {
+              columns: ["Talent", "Prerequisites", "Aptitudes", "Benefit"],
+              rows: [
+                  { Talent: "Ambidextrous", Prerequisites: "AG 30", Aptitudes: "Weapon Skill, Ballistic Skill", Benefit: "When combined with Two-Weapon Wielder, reduces penalty for attacking with both weapons to -10." },
+                  { Talent: "Blind Fighting", Prerequisites: "PER 30", Aptitudes: "Perception, Fieldcraft", Benefit: "No vision penalties to Weapon Skill tests." },
+                  { Talent: "Bodyguard", Prerequisites: "AG 35", Aptitudes: "Agility, Defense", Benefit: "Interpose between ally and attacker as a Reaction, redirecting the attack." },
+                  { Talent: "Catfall", Prerequisites: "AG 30", Aptitudes: "Agility, Fieldcraft", Benefit: "Reduce effective fall distance by AgB meters; +20 to Agility tests to avoid fall damage." },
+                  { Talent: "Clues from the Crowds", Prerequisites: "FEL 30", Aptitudes: "General, Social", Benefit: "Once per day, re-roll a test to gather information from people." },
+                  { Talent: "Die Hard", Prerequisites: "WP 40", Aptitudes: "Willpower, Defense", Benefit: "Make a +0 Willpower test to avoid Fatigue from Blood Loss." },
+                  { Talent: "Disarm", Prerequisites: "AG 30", Aptitudes: "Weapon Skill, Defense", Benefit: "Full Action to make an opposed Weapon Skill test to disarm a melee target." },
+                  { Talent: "Double Team", Prerequisites: "-", Aptitudes: "General, Offense", Benefit: "+10 bonus to Weapon Skill tests when Ganging Up on an opponent." },
+                  { Talent: "Enemy", Prerequisites: "-", Aptitudes: "General, Social", Benefit: "-10 penalty to Fellowship tests with a specific group." },
+                  { Talent: "Grenadier", Prerequisites: "BS 35", Aptitudes: "Ballistic Skill, Finesse", Benefit: "Reduce scatter distance of missed Blast weapons by half BS bonus meters." },
+                  { Talent: "Iron Jaw", Prerequisites: "T 40", Aptitudes: "Toughness, Defense", Benefit: "Make a +0 Toughness test to ignore effects of being Stunned." },
+                  { Talent: "Jaded", Prerequisites: "WP 40", Aptitudes: "Willpower, Defense", Benefit: "Immune to mundane horrors causing Fear tests." },
+                  { Talent: "Keen Intuition", Prerequisites: "INT 35", Aptitudes: "Perception, Social", Benefit: "Re-roll failed Awareness tests at -10." },
+                  { Talent: "Leap Up", Prerequisites: "AG 30", Aptitudes: "Agility, General", Benefit: "Stand from prone as a Free Action." },
+                  { Talent: "Leaping Dodge", Prerequisites: "AG 35, +10 Dodge", Aptitudes: "Agility, Defense", Benefit: "Use Dodge skill to avoid attacks from Spray weapons." },
+                  { Talent: "Nowhere to Hide", Prerequisites: "PER 30", Aptitudes: "Perception, Offense", Benefit: "Add DoS from an attack to reduce cover’s Armor value." },
+                  { Talent: "Peer", Prerequisites: "FEL 30", Aptitudes: "Fellowship, Social", Benefit: "+10 bonus to Fellowship tests with a specific group." },
+                  { Talent: "Precision Killer", Prerequisites: "BS 35 or WS 35", Aptitudes: "Ballistic Skill/Weapon Skill, Finesse", Benefit: "No penalty for Called Shots in combat." },
+                  { Talent: "Psionic Sense", Prerequisites: "Rank 1 Sense, PER 30", Aptitudes: "Perception, Psychic", Benefit: "Use the Sense skill as a free action to detect psychic effects." },
+                  { Talent: "Quick Draw", Prerequisites: "-", Aptitudes: "Agility, Finesse", Benefit: "Draw and ready Light or Basic weapons as a Free Action." },
+                  { Talent: "Rapid Reload", Prerequisites: "-", Aptitudes: "Agility, Fieldcraft", Benefit: "Halve reload times, rounding down." },
+                  { Talent: "Resistance", Prerequisites: "-", Aptitudes: "Toughness, Defense", Benefit: "+10 to tests to resist specific effects (e.g., heat, poison)." },
+                  { Talent: "Sound Constitution", Prerequisites: "-", Aptitudes: "Toughness, General", Benefit: "Gain one additional Wound; may be taken 2x Toughness bonus times." },
+                  { Talent: "Takedown", Prerequisites: "-", Aptitudes: "Weapon Skill, Offense", Benefit: "Special attack to Stun and knock prone a target on hit with damage." },
+                  { Talent: "Technical Knock", Prerequisites: "INT 30", Aptitudes: "Intelligence, Tech", Benefit: "Unjam guns as a Half Action instead of Full Action." },
+                  { Talent: "Vehicle Combat Training", Prerequisites: "Rank 1 Operate (any)", Aptitudes: "Agility, Fieldcraft", Benefit: "Use Operate skill for evasion reactions in vehicles or mechs." },
+                  { Talent: "Weapon-Tech", Prerequisites: "Hardware +10, INT 40", Aptitudes: "Intelligence, Tech", Benefit: "Enhance certain weapons’ damage and penetration by INT bonus for one round." }
+              ],
+          },
+      },
+      {
+          heading: "Tier 2 Talents",
+          table: {
+              columns: ["Talent", "Prerequisites", "Aptitudes", "Benefit"],
+              rows: [
+                { Talent: "Armor-Monger", Prerequisites: "INT 35, Hardware", Aptitudes: "Intelligence, Tech", Benefit: "Gain extra armor points equal to INT bonus, distributed at will." },
+                { Talent: "Antipsychotic Training", Prerequisites: "WP 35", Aptitudes: "Willpower, Defense", Benefit: "May use Willpower characteristic when making an evasion reaction against ranged or melee psionic attacks." },
+                { Talent: "Bulging Biceps", Prerequisites: "S 45", Aptitudes: "Strength, Offense", Benefit: "Remove bracing requirement from Heavy weapons, +20 to Athletics skill test for lifting or pulling." },
+                { Talent: "Combat Master", Prerequisites: "WS 30", Aptitudes: "Weapon Skill, Defense", Benefit: "Opponents get no bonus for outnumbering the character." },
+                { Talent: "Constant Vigilance", Prerequisites: "INT 35 or PER 35, Awareness +10", Aptitudes: "Perception, Defense", Benefit: "Use PER or INT instead of AG for Initiative rolls, and rolls two dice (picking higher) for the result." },
+                { Talent: "Contact Network", Prerequisites: "INT 35, FEL 30", Aptitudes: "Fellowship, Leadership", Benefit: "May use Charm or Command instead of Commerce for requisition tests." },
+                { Talent: "Coordinated Interrogation", Prerequisites: "S 40 or WP 40, Clues from the Crowds, Interrogation", Aptitudes: "Intelligence, Social", Benefit: "+10 to interrogation tests, additional +10 per ally with this talent." },
+                { Talent: "Counter Attack", Prerequisites: "WS 40", Aptitudes: "Weapon Skill, Defense", Benefit: "Make a Standard Attack after a successful Parry, with a -20 Weapon Skill penalty." },
+                { Talent: "Devastating Assault", Prerequisites: "WS 35", Aptitudes: "Weapon Skill, Offense", Benefit: "On a successful All Out Attack, may make a second All Out Attack as a free action with the same bonuses and penalties." },
+                { Talent: "Double Tap", Prerequisites: "Two-Weapon Wielder", Aptitudes: "Finesse, Offense", Benefit: "Gain +20 to second ranged attack against the same target if the first attack scores one or more hits." },
+                { Talent: "Face in a Crowd", Prerequisites: "FEL 45, Clues from the Crowds", Aptitudes: "Fellowship, Social", Benefit: "Use Fellowship instead of Agility when trailing targets or hiding amongst people." },
+                { Talent: "Field Vivisection", Prerequisites: "BS or WS 40, +10 Medical skill", Aptitudes: "Ballistic Skill/Weapon Skill, Knowledge", Benefit: "Use Medical skill instead of WS/BS for Called Shot attacks against targets with appropriate Lore knowledge." },
+                { Talent: "Hard Target", Prerequisites: "AG 40", Aptitudes: "Agility, Defense", Benefit: "Enemies suffer -20 to hit the character when they Charge or Run." },
+                { Talent: "Hardy", Prerequisites: "T 40", Aptitudes: "Toughness, Defense", Benefit: "Character always heals as if Lightly Damaged." },
+                { Talent: "Hatred", Prerequisites: "-", Aptitudes: "Weapon Skill, Social", Benefit: "+10 bonus when attacking hated targets; must pass a +0 Willpower test to retreat or surrender." },
+                { Talent: "Hip Shooting", Prerequisites: "BS 40, AG 40", Aptitudes: "Ballistic Skill, Finesse", Benefit: "As a Full Action, take a Full Move and make a single shot attack with a ranged weapon. Two-Weapon Wielder allows two single shots." },
+                { Talent: "Hotshot Pilot", Prerequisites: "Rank 2 in any Operate, AG 35", Aptitudes: "Agility, Tech", Benefit: "On successful Operate test, take 1 Fatigue to add half AG bonus DoS. On failed test, take 1 Fatigue to reduce DoF by AG bonus." },
+                { Talent: "Independent Targeting", Prerequisites: "BS 40", Aptitudes: "Ballistic Skill, Finesse", Benefit: "Fire at multiple targets more than 10 meters apart when using two weapons." },
+                { Talent: "Inescapable Attack", Prerequisites: "BS 40 or WS 40, PER 35", Aptitudes: "Weapon Skill/Ballistic Skill, Finesse", Benefit: "Impose 10*DoS penalty to evasion attempts against a designated attack once per round." },
+                { Talent: "Inspiring Aura", Prerequisites: "FEL 40", Aptitudes: "Leadership, Willpower", Benefit: "Use Fellowship to contest Fear checks. Allies within 10m gain +20 against Fear tests." },
+                { Talent: "Iron Resolve", Prerequisites: "Resistance (Fear), Jaded", Aptitudes: "Defense, Willpower", Benefit: "Re-roll failed Fear or Pinning tests with -10." },
+                { Talent: "Killing Strike", Prerequisites: "WS 50", Aptitudes: "Weapon Skill, Offense", Benefit: "Spend 10 Stress to make melee attacks unavoidable via Dodge or Parry for one turn." },
+                { Talent: "Loremaster", Prerequisites: "INT 40", Aptitudes: "Knowledge, Social", Benefit: "Re-roll failed Lore tests once, at a -10 penalty." },
+                { Talent: "Marksman", Prerequisites: "BS 35", Aptitudes: "Ballistic Skill, Finesse", Benefit: "No penalties for firing at long or extreme range." },
+                { Talent: "One-on-One", Prerequisites: "WS 40", Aptitudes: "Finesse, Weapon Skill", Benefit: "Gain extra DoS on WS tests when fighting a single enemy in melee, equal to half WS bonus." },
+                { Talent: "Pure Hatred", Prerequisites: "Hatred", Aptitudes: "Offense, Willpower", Benefit: "Gain Vengeful (9) quality against opponents of the Hatred group." },
+                { Talent: "Strong Minded", Prerequisites: "WP 30, Resistance (Psionics)", Aptitudes: "Willpower, Defense", Benefit: "Re-roll failed Willpower tests to resist psionic abilities." },
+                { Talent: "Swift Attack", Prerequisites: "WS 30", Aptitudes: "Weapon Skill, Finesse", Benefit: "Make multiple melee attacks as per Swift Attack combat action." },
+                { Talent: "Two-Weapon Wielder", Prerequisites: "-", Aptitudes: "Weapon Skill/Ballistic Skill, Finesse", Benefit: "Attack with two weapons in either melee or ranged combat as part of the same Half Action; both attacks suffer -20." },
+                { Talent: "Unarmed Specialist", Prerequisites: "Ambidextrous, AG 35, WS 35", Aptitudes: "Strength, Offense", Benefit: "Unarmed attacks hit as Deadly Natural Weapons; reroll damage." },
+                { Talent: "Psi-Daredevil", Prerequisites: "Strong Minded, PSI 50", Aptitudes: "Willpower, Psychic", Benefit: "When pushing, add 1d5 to psi rating but suffer +30 on psychic phenomenon rolls." },
+                { Talent: "Whirlwind of Death", Prerequisites: "WS 40", Aptitudes: "Weapon Skill, Finesse", Benefit: "As a Half Action, make a melee attack against each character engaged in melee (up to WS bonus)." },
+                { Talent: "Psi-Hunter", Prerequisites: "WP 40", Aptitudes: "Knowledge, Perception", Benefit: "Gain Sense skill even without psionic abilities." },
+            ],
+          },
+      },
+      {
+        heading: "Tier 3 Talents",
+        table: {
+            columns: ["Talent", "Prerequisites", "Aptitudes", "Benefit"],
+            rows: [
+              { Talent: "Absolute Resolve", Prerequisites: "Jaded, Resistance (Fear), WP 45", Aptitudes: "Willpower, Defense", Benefit: "Subtract WP bonus from DoF on a failed Fear or Pinning test. If reduced to zero or less, count as passing with 1 DoS." },
+              { Talent: "Assassin Strike", Prerequisites: "AG 40, Acrobatics", Aptitudes: "Weapon Skill, Fieldcraft", Benefit: "After a melee attack, make a +0 Acrobatics test to Half Move as a free action without provoking free attacks." },
+              { Talent: "Iron Will", Prerequisites: "Psi rating, Strong Minded, PSI 40", Aptitudes: "Willpower, Psychic", Benefit: "Add 5x psi rating to any opposed test when defending against psionic abilities." },
+              { Talent: "Blademaster", Prerequisites: "WS 30", Aptitudes: "Weapon Skill, Finesse", Benefit: "Re-roll one missed bladed weapon attack per round." },
+              { Talent: "Crushing Blow", Prerequisites: "WS 40", Aptitudes: "Weapon Skill, Offense", Benefit: "Add half WS bonus (rounded up) to melee damage." },
+              { Talent: "Deathdealer", Prerequisites: "BS 45 or WS 45", Aptitudes: "Perception, Finesse", Benefit: "Critical damage attacks deal extra damage equal to Perception bonus." },
+              { Talent: "Spray Specialist", Prerequisites: "BS 45, WP 35", Aptitudes: "General, Finesse", Benefit: "Attacks with the Spray quality only affect enemies." },
+              { Talent: "Eye of Vengeance", Prerequisites: "BS 50", Aptitudes: "Ballistic Skill, Offense", Benefit: "On successful ranged attack, spend 8 Stress to add DoS to damage and penetration." },
+              { Talent: "Flash of Insight", Prerequisites: "INT 40", Aptitudes: "Perception, Knowledge", Benefit: "Spend 10 Stress to reveal a clue in an ongoing investigation." },
+              { Talent: "Halo of Command", Prerequisites: "FEL 40, WP 40", Aptitudes: "Fellowship, Leadership", Benefit: "Social skills affect characters within 100 x Fellowship bonus meters." },
+              { Talent: "Hammer Blow", Prerequisites: "Crushing Blow", Aptitudes: "Strength, Offense", Benefit: "All Out Attack adds half Strength bonus to weapon pen and gains Concussive(2)." },
+              { Talent: "Infused Knowledge", Prerequisites: "INT 40", Aptitudes: "Intelligence, Knowledge", Benefit: "All Lore tests count as known." },
+              { Talent: "Into the Jaws of Hell", Prerequisites: "Absolute Resolve, Halo of Command", Aptitudes: "Leadership, Willpower", Benefit: "Subtract FEL bonus from DoF on failed Fear or Pinning tests. Zero or less counts as passing with 1 DoS." },
+              { Talent: "Lightning Attack", Prerequisites: "Swift Attack", Aptitudes: "Weapon Skill, Finesse", Benefit: "Make many melee attacks with a single roll (see Lightning Attack combat action)." },
+              { Talent: "Mastery", Prerequisites: "+30 in selected skill", Aptitudes: "Both skill Aptitudes", Benefit: "Spend 10 Stress to automatically succeed at +0 test with DoS equal to characteristic bonus." },
+              { Talent: "Mighty Shot", Prerequisites: "BS 40", Aptitudes: "Ballistic Skill, Offense", Benefit: "Add half BS bonus (rounded up) to ranged damage rolls." },
+              { Talent: "Never Die", Prerequisites: "WP 50, T 50", Aptitudes: "Toughness, Defense", Benefit: "Spend 10 Stress to ignore injury, fatigue, and critical damage for an encounter unless death is immediate." },
+              { Talent: "Preternatural Speed", Prerequisites: "WS 40, AG 50", Aptitudes: "Agility, Offense", Benefit: "Double speed when charging." },
+              { Talent: "Push the Limit", Prerequisites: "+10 in Operate, Hardware", Aptitudes: "Perception, Tech", Benefit: "Add +20 to an Operate test once per round. On 4+ DoF, take 1d5 critical damage to vehicle." },
+              { Talent: "Psi-Controller", Prerequisites: "PSI 35", Aptitudes: "Willpower, Psychic", Benefit: "Roll twice on psychic phenomena table and select preferred result." },
+              { Talent: "Psi-Lock", Prerequisites: "Psi rating, Strong Minded, PSI 50", Aptitudes: "Willpower, Psychic", Benefit: "Ignore psychic phenomenon once per session, suffer 1d5 Energy damage to head and lose psionic ability until next turn." },
+              { Talent: "Shield Wall", Prerequisites: "Ambidextrous, WS 40", Aptitudes: "Defense, Weapon Skill", Benefit: "Re-roll one failed parry attempt per round when armed with a shield." },
+              { Talent: "Sprint", Prerequisites: "-", Aptitudes: "Agility, Fieldcraft", Benefit: "Full Move action gains extra meters equal to AG bonus. Run action doubles distance; gain 1 Fatigue if repeated in the next round." },
+              { Talent: "Step Aside", Prerequisites: "AG 40, Dodge or Parry", Aptitudes: "Agility, Defense", Benefit: "Make an additional Dodge or Parry attempt each round." },
+              { Talent: "Superior Surgeon", Prerequisites: "+10 Medical", Aptitudes: "Intelligence, Fieldcraft", Benefit: "+20 to Medical tests; ignore penalties for heavily damaged patients, -10 penalty for critical damage." },
+              { Talent: "Target Selection", Prerequisites: "BS 50", Aptitudes: "Ballistic Skill, Finesse", Benefit: "Shoot into melee with no penalty. Aim action prevents friendly fire." },
+              { Talent: "Thunder Charge", Prerequisites: "S 50", Aptitudes: "Strength, Offense", Benefit: "Charge action allows opposed Strength test against foes in your path, knocking them prone on failure." },
+              { Talent: "True Grit", Prerequisites: "T 40", Aptitudes: "Toughness, Defense", Benefit: "Reduce critical damage by Toughness bonus (minimum 1)." },
+              { Talent: "Two-Weapon Master", Prerequisites: "AG 45, Ambidextrous, BS 40 or WS 40, Two-Weapon Wielder", Aptitudes: "Finesse, Offense", Benefit: "Remove penalties for attacking with two single-handed weapons." },
+          ],
+        },
+    },
+  ]
+};
 
 export const RULEBOOK_DATA = {
-    introduction: {
-        title: "Introduction",
-        sections: [
-          {
-            heading: "About the System",
-            content: `This document serves as both a quick-reference guide and a rulebook for the Starlight game system. It is a slimmer and more widely applicable version of the Dark Heresy 2e system. Familiarity with DH2e is recommended.`,
-          },
-        ],
-      },
-  character: CHARACTER,
+  introduction: {
+      title: "Introduction",
+      sections: [
+        {
+          heading: "About the Starlight System",
+          content: `This document serves as both a quick-reference guide and a rulebook for the Starlight science fiction roleplaying game system. It is a slimmer and more widely applicable version of the Dark Heresy 2e game system. Familiarity with DH2e is recommended.`,
+        },
+      ],
+    },
+  "character": CHARACTER_INFO,
+  "talents": TALENT_INFO,
+  "traits": TRAIT_INFO,
   "energy-damage": CRITICAL_DAMAGE_ENERGY,
   "explosive-damage": CRITICAL_DAMAGE_EXPLOSIVE,
   "impact-damage": CRITICAL_DAMAGE_IMPACT,

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { RULEBOOK_DATA } from "../constants/rulebook";
+import { RULEBOOK_DATA } from "../constants/rulebookData";
 
 
 const Rulebook = () => {
   const { section } = useParams();
-  const [searchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
   const navigate = useNavigate();
 
