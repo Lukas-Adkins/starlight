@@ -25,6 +25,19 @@ const formatPrice = (price) => {
   return price.toLocaleString("en-US"); // Format number with commas
 };
 
+const CATEGORY_FILTERS = {
+  "Ranged Weapon": [{ field: "Class", display: "Class" }, { field: "Special / Notes", display: "Special" }],
+  "Melee Weapon": [{ field: "Class", display: "Class" }, { field: "Special / Notes", display: "Special" }],
+  "Armor": [{ field: "Max Agility", display: "Max Agility" }, { field: "Covers", display: "Covers" }, { field: "Special / Notes", display: "Special" }],
+  "Cybernetic": [{ field: "Slots", display: "Slots" }],
+  "Mech Ranged Weapon": [{ field: "Class", display: "Class" }, { field: "Location", display: "Location" }, { field: "Special / Notes", display: "Special" }],
+  "Mech Melee Weapon": [{ field: "Class", display: "Class" }, { field: "Location", display: "Location" }, { field: "Special / Notes", display: "Special" }],
+  "Mech Utility": [{ field: "Location", display: "Location" }],
+  "Mech Engine": [{ field: "Location", display: "Location" }],
+};
+
+const CLASS_CUSTOM_ORDER = ["Light, Ranged", "Basic, Ranged", "Heavy, Ranged"];
+
 const useBodyScrollLock = (isLocked) => {
   useEffect(() => {
     const body = document.body;
@@ -39,7 +52,6 @@ const useBodyScrollLock = (isLocked) => {
   }, [isLocked]);
 };
 
-
 const StarlightTable = () => {
   const categories = [...CATEGORIES.types.sort((a, b) => {
     return CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b);
@@ -49,6 +61,7 @@ const StarlightTable = () => {
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
   const [selectedItem, setSelectedItem] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   useBodyScrollLock(!!selectedItem);
 
@@ -141,12 +154,39 @@ const StarlightTable = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
+  useEffect(() => {
+    setSelectedFilters({});
+  }, [activeCategory]);
+
   const filteredItems = React.useMemo(() => {
-    if (!debouncedSearchTerm) return items;
-    return items.filter((item) =>
-      item.Name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    );
-  }, [items, debouncedSearchTerm]);
+    if (!debouncedSearchTerm && Object.keys(selectedFilters).length === 0)
+      return items;
+  
+    return items.filter((item) => {
+      // Match search term
+      const matchesSearch = item.Name.toLowerCase().includes(
+        debouncedSearchTerm.toLowerCase()
+      );
+  
+      // Match selected filters
+      const matchesFilters = Object.entries(selectedFilters).every(([key, value]) => {
+        if (!value) return true; // Ignore empty filters
+        if (key === "Special / Notes") {
+          const specialValues = item["Special / Notes"]
+            ? item["Special / Notes"]
+                .split(",")
+                .map((phrase) => phrase.trim().replace(/\s*\(.*\)/, "").toLowerCase())
+            : [];
+          return specialValues.includes(value.toLowerCase());
+        }
+        return item[key]?.toString().toLowerCase() === value.toLowerCase();
+      });
+  
+      return matchesSearch && matchesFilters;
+    });
+  }, [items, debouncedSearchTerm, selectedFilters]);
+  
+  
   
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
@@ -158,6 +198,90 @@ const StarlightTable = () => {
     });
   }, [filteredItems]);  
 
+  const renderCategoryFilters = () => {
+    const filters = CATEGORY_FILTERS[activeCategory] || [];
+  
+    const getOptionsForFilter = (field) => {
+      if (field === "Class") {
+        const uniqueClasses = Array.from(
+          new Set(items.map((item) => item[field]).filter(Boolean))
+        );
+  
+        // Custom sort order for "Class"
+        return ["All (Show All)", ...uniqueClasses.sort((a, b) => {
+          const indexA = CLASS_CUSTOM_ORDER.indexOf(a);
+          const indexB = CLASS_CUSTOM_ORDER.indexOf(b);
+  
+          // If both are in the custom order, sort by index
+          if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+          }
+  
+          // If one is in the custom order, it comes first
+          if (indexA !== -1) return -1;
+          if (indexB !== -1) return 1;
+  
+          // Fallback to alphabetical sorting for others
+          return a.localeCompare(b);
+        })];
+      }
+  
+      if (field === "Special / Notes") {
+        const uniquePhrases = Array.from(
+          new Set(
+            items
+              .flatMap((item) =>
+                item["Special / Notes"]
+                  ?.split(",")
+                  .map((phrase) => phrase.trim().replace(/\s*\(.*\)/, ""))
+              )
+              .filter(Boolean)
+          )
+        );
+        return ["All (Show All)", ...uniquePhrases.sort((a, b) => a.localeCompare(b))];
+      }
+  
+      return ["All (Show All)", ...Array.from(new Set(items.map((item) => item[field]).filter(Boolean))).sort((a, b) => {
+        if (!isNaN(a) && !isNaN(b)) {
+          return Number(a) - Number(b);
+        }
+        return a.localeCompare(b);
+      })];
+    };
+  
+    return (
+      <div className="flex flex-wrap gap-4 items-center">
+        {filters.map(({ field, display }) => (
+          <div key={field} className="w-48">
+            <select
+              id={field}
+              value={selectedFilters[field] || "All (Show All)"} // Default to "All" if no filter is selected
+              onChange={(e) =>
+                setSelectedFilters((prev) => ({
+                  ...prev,
+                  [field]: e.target.value === "All (Show All)" ? "" : e.target.value, // Clear filter when "All" is selected
+                }))
+              }
+              className="p-2 bg-gray-800 border border-gray-700 text-white rounded w-full"
+            >
+              {getOptionsForFilter(field).map((option) => (
+                <option key={option} value={option}>
+                  {option === "All (Show All)" ? `All ${display}` : option}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+  
+  
+  
+  
+  
+  
   
 const renderFields = (item, fields) => {
 
@@ -331,35 +455,40 @@ const highlightWithTooltips = (text) => {
   return (
     <div className="container mx-auto px-4">
       {/* Search Bar and Dropdown */}
-      <div className="flex items-center mb-4 gap-4">
-        <div className="flex items-center relative flex-grow">
-          <FaSearch className="absolute left-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search items..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            whileFocus={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          />
-        </div>
-        <div>
-          <select
-            value={activeCategory}
-            onChange={(e) => setActiveCategory(e.target.value)}
-            className="p-2 bg-gray-800 border border-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            whileFocus={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <div className="flex flex-wrap gap-4 items-center mb-4">
+  {/* Search Bar */}
+  <div className="flex-grow">
+    <div className="flex items-center relative">
+      <FaSearch className="absolute left-3 text-gray-400" />
+      <input
+        type="text"
+        placeholder="Search items..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded"
+      />
+    </div>
+  </div>
+
+  {/* Dynamic Filters */}
+  <div className="flex flex-wrap gap-4">{renderCategoryFilters()}</div>
+
+  {/* Category Dropdown */}
+  <div>
+    <select
+      value={activeCategory}
+      onChange={(e) => setActiveCategory(e.target.value)}
+      className="p-2 bg-gray-800 border border-gray-700 text-white rounded"
+    >
+      {categories.map((cat) => (
+        <option key={cat} value={cat}>
+          {cat}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
       {isError && <p className="text-red-500">Error loading items. Please try again later.</p>}
 
