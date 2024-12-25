@@ -5,6 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 
 import ItemCard from "./ItemCard";
+import Modal from "./Modal";
+import LoadingSkeleton from "./LoadingSkeleton";
+import Filters, { useFilters } from "./Filters";
 
 import fetchItemsByCategory from "../utils/fetchItemsByCategory";
 import formatPrice from "../utils/formatPrice";
@@ -60,138 +63,7 @@ const StarlightTable = () => {
     setSelectedFilters({});
   }, [activeCategory]);
 
-  const filteredItems = React.useMemo(() => {
-    if (!debouncedSearchTerm && Object.keys(selectedFilters).length === 0)
-      return items;
-
-    return items.filter((item) => {
-      // Match search term
-      const matchesSearch = item.Name.toLowerCase().includes(
-        debouncedSearchTerm.toLowerCase()
-      );
-
-      // Match selected filters
-      const matchesFilters = Object.entries(selectedFilters).every(
-        ([key, value]) => {
-          if (!value) return true; // Ignore empty filters
-          if (key === "Special / Notes") {
-            const specialValues = item["Special / Notes"]
-              ? item["Special / Notes"].split(",").map((phrase) =>
-                  phrase
-                    .trim()
-                    .replace(/\s*\(.*\)/, "")
-                    .toLowerCase()
-                )
-              : [];
-            return specialValues.includes(value.toLowerCase());
-          }
-          return item[key]?.toString().toLowerCase() === value.toLowerCase();
-        }
-      );
-
-      return matchesSearch && matchesFilters;
-    });
-  }, [items, debouncedSearchTerm, selectedFilters]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...filteredItems].sort((a, b) => {
-      if (a.Type < b.Type) return -1;
-      if (a.Type > b.Type) return 1;
-      const rarityA = RARITY_ORDER[a.Rarity] || 100;
-      const rarityB = RARITY_ORDER[b.Rarity] || 100;
-      return rarityA - rarityB;
-    });
-  }, [filteredItems]);
-
-  const renderCategoryFilters = () => {
-    const filters = CATEGORY_FILTERS[activeCategory] || [];
-
-    const getOptionsForFilter = (field) => {
-      if (field === "Class") {
-        const uniqueClasses = Array.from(
-          new Set(items.map((item) => item[field]).filter(Boolean))
-        );
-
-        // Custom sort order for "Class"
-        return [
-          "All (Show All)",
-          ...uniqueClasses.sort((a, b) => {
-            const indexA = CLASS_CUSTOM_ORDER.indexOf(a);
-            const indexB = CLASS_CUSTOM_ORDER.indexOf(b);
-
-            // If both are in the custom order, sort by index
-            if (indexA !== -1 && indexB !== -1) {
-              return indexA - indexB;
-            }
-
-            // If one is in the custom order, it comes first
-            if (indexA !== -1) return -1;
-            if (indexB !== -1) return 1;
-
-            // Fallback to alphabetical sorting for others
-            return a.localeCompare(b);
-          }),
-        ];
-      }
-
-      if (field === "Special / Notes") {
-        const uniquePhrases = Array.from(
-          new Set(
-            items
-              .flatMap((item) =>
-                item["Special / Notes"]
-                  ?.split(",")
-                  .map((phrase) => phrase.trim().replace(/\s*\(.*\)/, ""))
-              )
-              .filter(Boolean)
-          )
-        );
-        return [
-          "All (Show All)",
-          ...uniquePhrases.sort((a, b) => a.localeCompare(b)),
-        ];
-      }
-
-      return [
-        "All (Show All)",
-        ...Array.from(
-          new Set(items.map((item) => item[field]).filter(Boolean))
-        ).sort((a, b) => {
-          if (!isNaN(a) && !isNaN(b)) {
-            return Number(a) - Number(b);
-          }
-          return a.localeCompare(b);
-        }),
-      ];
-    };
-
-    return (
-      <div className="flex flex-wrap gap-4 items-center">
-        {filters.map(({ field, display }) => (
-          <div key={field} className="w-48">
-            <select
-              id={field}
-              value={selectedFilters[field] || "All (Show All)"} // Default to "All" if no filter is selected
-              onChange={(e) =>
-                setSelectedFilters((prev) => ({
-                  ...prev,
-                  [field]:
-                    e.target.value === "All (Show All)" ? "" : e.target.value, // Clear filter when "All" is selected
-                }))
-              }
-              className="p-2 bg-gray-800 border border-gray-700 text-white rounded w-full"
-            >
-              {getOptionsForFilter(field).map((option) => (
-                <option key={option} value={option}>
-                  {option === "All (Show All)" ? `All ${display}` : option}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const sortedItems = useFilters(items, debouncedSearchTerm, selectedFilters, RARITY_ORDER);
 
   const renderFields = (item, fields) => {
     const reorderedFields = fields
@@ -330,8 +202,15 @@ const StarlightTable = () => {
           </div>
         </div>
 
-        {/* Dynamic Filters */}
-        <div className="flex flex-wrap gap-4">{renderCategoryFilters()}</div>
+        {/* Filters */}
+        <Filters
+          activeCategory={activeCategory}
+          selectedFilters={selectedFilters}
+          setSelectedFilters={setSelectedFilters}
+          items={items}
+          categoryFilters={CATEGORY_FILTERS}
+          classCustomOrder={CLASS_CUSTOM_ORDER}
+        />
 
         {/* Category Dropdown */}
         <div>
@@ -357,26 +236,7 @@ const StarlightTable = () => {
 
       <AnimatePresence mode="wait">
         {isFetching ? (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            {Array(8)
-              .fill()
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-700 p-4 rounded animate-pulse"
-                >
-                  <div className="h-4 bg-gray-500 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-600 rounded w-3/4"></div>
-                </div>
-              ))}
-          </motion.div>
+          <LoadingSkeleton count={8} />
         ) : sortedItems.length === 0 ? (
           <motion.div
             key="empty"
@@ -404,62 +264,13 @@ const StarlightTable = () => {
         )}
       </AnimatePresence>
 
-      {/* Modal */}
-      {selectedItem && (
-        <AnimatePresence>
-          <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 sm:px-0"
-            onClick={() => setSelectedItem(null)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div
-              className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-3xl relative max-h-screen overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl p-2 transition-colors"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-
-              {/* Item Name */}
-              <h2 className="text-2xl font-bold text-white mb-6">
-                {selectedItem.Name}
-              </h2>
-
-              {/* Item Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {renderFields(
-                  selectedItem,
-                  FIELD_MAPPING[selectedItem.Type] || Object.keys(selectedItem)
-                ).map((field, index) =>
-                  field ? (
-                    React.isValidElement(field) &&
-                    (field.key === "Description" ||
-                      field.key === "Special / Notes") ? (
-                      // Wide fields (e.g., Description)
-                      <div key={index} className="col-span-1 sm:col-span-2">
-                        {field}
-                      </div>
-                    ) : (
-                      // Regular fields
-                      <div key={index} className="col-span-1">
-                        {field}
-                      </div>
-                    )
-                  ) : null
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      )}
+      <Modal
+        item={selectedItem}
+        onClose={() => setSelectedItem(null)}
+        renderFields={(item, fields) =>
+          renderFields(item, FIELD_MAPPING[item.Type] || Object.keys(item))
+        }
+      />
     </div>
   );
 };
