@@ -1,36 +1,35 @@
-export const RARITY_ORDER = {
-  Unique: 11,
-  "Near Unique": 10,
-  "Extremely Rare": 9,
-  "Very Rare": 8,
-  Rare: 7,
-  Scarce: 6,
-  Average: 5,
-  Common: 4,
-  Plentiful: 3,
-  Abundant: 2,
-  Ubiquitous: 1,
+export const RARITY = {
+  ORDER: {
+    Unique: 11,
+    "Near Unique": 10,
+    "Extremely Rare": 9,
+    "Very Rare": 8,
+    Rare: 7,
+    Scarce: 6,
+    Average: 5,
+    Common: 4,
+    Plentiful: 3,
+    Abundant: 2,
+    Ubiquitous: 1,
+  },
+  COLORS: {
+    Unique: "text-yellow-500",
+    "Near Unique": "text-orange-500",
+    "Extremely Rare": "text-red-500",
+    "Very Rare": "text-pink-500",
+    Rare: "text-purple-500",
+    Scarce: "text-blue-500",
+    Average: "text-green-500",
+    Common: "text-gray-500",
+    Plentiful: "text-teal-500",
+    Abundant: "text-lime-500",
+    Ubiquitous: "text-emerald-500",
+    Default: "text-gray-500",
+  },
+  getColor: (rarity) => RARITY.COLORS[rarity] || RARITY.COLORS.Default,
 };
 
-export const RARITY_COLORS = {
-  Unique: "text-yellow-500",
-  "Near Unique": "text-orange-500",
-  "Extremely Rare": "text-red-500",
-  "Very Rare": "text-pink-500",
-  Rare: "text-purple-500",
-  Scarce: "text-blue-500",
-  Average: "text-green-500",
-  Common: "text-gray-500",
-  Plentiful: "text-teal-500",
-  Abundant: "text-lime-500",
-  Ubiquitous: "text-emerald-500",
-  Default: "text-gray-500",
-};
-
-export const getRarityColor = (rarity) =>
-  RARITY_COLORS[rarity] || RARITY_COLORS.Default;
-
-export const FULL_FIELD_NAMES = {
+export const ITEM_FULL_FIELD_NAMES = {
   Mag: "Magazine Size",
   Rld: "Reload Time",
   RoF: "Rate of Fire",
@@ -52,9 +51,13 @@ export const FULL_FIELD_NAMES = {
   Description: "Description",
 };
 
-export const CLASS_CUSTOM_ORDER = ["Light, Ranged", "Basic, Ranged", "Heavy, Ranged"];
+export const CLASS_CUSTOM_ORDER = [
+  "Light, Ranged",
+  "Basic, Ranged",
+  "Heavy, Ranged",
+];
 
-export const FIELD_MAPPING = {
+export const ITEM_FIELD_MAPPING = {
   "Ranged Weapon": [
     "Class",
     "Range",
@@ -169,7 +172,7 @@ export const CUSTOM_TYPE_ORDER = [
   "Mech Engine",
 ];
 
-export const CATEGORY_FILTERS = {
+export const ITEM_CATEGORY_FILTERS = {
   "Ranged Weapon": [
     { field: "Class", display: "Class" },
     { field: "Special / Notes", display: "Special" },

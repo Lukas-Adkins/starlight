@@ -46,7 +46,6 @@ const NavBar = () => {
             >
               Rulebook
             </Link>
-            
           </div>
 
           {/* Items Page Link */}

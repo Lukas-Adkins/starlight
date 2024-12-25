@@ -51,7 +51,9 @@ const Filters = ({
       "All (Show All)",
       ...Array.from(
         new Set(items.map((item) => item[field]).filter(Boolean))
-      ).sort((a, b) => (!isNaN(a) && !isNaN(b) ? Number(a) - Number(b) : a.localeCompare(b))),
+      ).sort((a, b) =>
+        !isNaN(a) && !isNaN(b) ? Number(a) - Number(b) : a.localeCompare(b)
+      ),
     ];
   };
 
@@ -65,7 +67,8 @@ const Filters = ({
             onChange={(e) =>
               setSelectedFilters((prev) => ({
                 ...prev,
-                [field]: e.target.value === "All (Show All)" ? "" : e.target.value,
+                [field]:
+                  e.target.value === "All (Show All)" ? "" : e.target.value,
               }))
             }
             className="p-2 bg-gray-800 border border-gray-700 text-white rounded w-full"
@@ -82,24 +85,37 @@ const Filters = ({
   );
 };
 
-export const useFilters = (items, debouncedSearchTerm, selectedFilters, rarityOrder) => {
+export const useFilters = (
+  items,
+  debouncedSearchTerm,
+  selectedFilters,
+  rarityOrder
+) => {
   const filteredItems = useMemo(() => {
-    if (!debouncedSearchTerm && Object.keys(selectedFilters).length === 0) return items;
+    if (!debouncedSearchTerm && Object.keys(selectedFilters).length === 0)
+      return items;
 
     return items.filter((item) => {
-      const matchesSearch = item.Name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      const matchesFilters = Object.entries(selectedFilters).every(([key, value]) => {
-        if (!value) return true;
-        if (key === "Special / Notes") {
-          const specialValues = item["Special / Notes"]
-            ? item["Special / Notes"].split(",").map((phrase) =>
-                phrase.trim().replace(/\s*\(.*\)/, "").toLowerCase()
-              )
-            : [];
-          return specialValues.includes(value.toLowerCase());
+      const matchesSearch = item.Name.toLowerCase().includes(
+        debouncedSearchTerm.toLowerCase()
+      );
+      const matchesFilters = Object.entries(selectedFilters).every(
+        ([key, value]) => {
+          if (!value) return true;
+          if (key === "Special / Notes") {
+            const specialValues = item["Special / Notes"]
+              ? item["Special / Notes"].split(",").map((phrase) =>
+                  phrase
+                    .trim()
+                    .replace(/\s*\(.*\)/, "")
+                    .toLowerCase()
+                )
+              : [];
+            return specialValues.includes(value.toLowerCase());
+          }
+          return item[key]?.toString().toLowerCase() === value.toLowerCase();
         }
-        return item[key]?.toString().toLowerCase() === value.toLowerCase();
-      });
+      );
       return matchesSearch && matchesFilters;
     });
   }, [items, debouncedSearchTerm, selectedFilters]);

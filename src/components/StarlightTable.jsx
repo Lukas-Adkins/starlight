@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,19 +10,15 @@ import LoadingSkeleton from "./LoadingSkeleton";
 import Filters, { useFilters } from "./Filters";
 
 import fetchItemsByCategory from "../utils/fetchItemsByCategory";
-import formatPrice from "../utils/formatPrice";
 import useBodyScrollLock from "../utils/useBodyScrollLock";
-import highlightWithTooltips from "../utils/highlightWithToolTips";
 
 import {
   CATEGORIES,
-  RARITY_ORDER,
-  FULL_FIELD_NAMES,
-  FIELD_MAPPING,
+  RARITY,
   CUSTOM_TYPE_ORDER,
   ITEM_STALE_TIME,
   ITEM_CACHE_ITEM,
-  CATEGORY_FILTERS,
+  ITEM_CATEGORY_FILTERS,
   CLASS_CUSTOM_ORDER,
 } from "../constants/appConfig";
 
@@ -63,126 +59,12 @@ const StarlightTable = () => {
     setSelectedFilters({});
   }, [activeCategory]);
 
-  const sortedItems = useFilters(items, debouncedSearchTerm, selectedFilters, RARITY_ORDER);
-
-  const renderFields = (item, fields) => {
-    const reorderedFields = fields
-      .filter((field) => field !== "Special / Notes" && field !== "Description")
-      .concat(["Special / Notes", "Description"]);
-
-    return reorderedFields.map((field) => {
-      const fullFieldName = FULL_FIELD_NAMES[field] || field;
-
-      // Skip empty or undefined fields
-      if (!item[field] || item[field] === "N/A") return null;
-
-      // Special case for 'Special / Notes'
-      if (field === "Special / Notes") {
-        const fieldValue =
-          typeof item[field] === "string" ? item[field] : String(item[field]);
-
-        return (
-          <div
-            key={field}
-            className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
-          >
-            <strong className="text-gray-400 block mb-2">
-              {fullFieldName}:
-            </strong>
-            <DescriptionField text={fieldValue} enableTooltips={true} />
-          </div>
-        );
-      }
-
-      // Handle 'Description' without tooltips
-      if (field === "Description") {
-        const fieldValue =
-          typeof item[field] === "string" ? item[field] : String(item[field]);
-
-        return (
-          <div
-            key={field}
-            className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
-          >
-            <strong className="text-gray-400 block mb-2">
-              {fullFieldName}:
-            </strong>
-            <DescriptionField text={fieldValue} enableTooltips={false} />
-          </div>
-        );
-      }
-
-      // Special case for 'URL'
-      if (field === "Url") {
-        return (
-          <div
-            key={field}
-            className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
-          >
-            <strong className="text-gray-400">{fullFieldName}:</strong>
-            <a
-              href={item[field]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline flex items-center"
-            >
-              Image <FaExternalLinkAlt className="ml-2" />
-            </a>
-          </div>
-        );
-      }
-
-      // Default field layout for other fields
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
-        >
-          <span className="font-semibold text-gray-400">{fullFieldName}:</span>
-          <span className="text-gray-100">
-            {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
-          </span>
-        </div>
-      );
-    });
-  };
-
-  // Component for handling expandable/collapsible text
-  const DescriptionField = ({ text, enableTooltips = false }) => {
-    const [isExpanded, setIsExpanded] = React.useState(false);
-
-    const renderContent = () => {
-      if (typeof text === "string") {
-        const truncatedText =
-          text.length > 300 ? text.slice(0, 300) + "..." : text;
-
-        if (enableTooltips) {
-          return isExpanded
-            ? highlightWithTooltips(text, activeCategory)
-            : highlightWithTooltips(truncatedText, activeCategory);
-        } else {
-          return isExpanded ? text : truncatedText;
-        }
-      }
-
-      // If `text` is already JSX, render it directly
-      return text;
-    };
-
-    return (
-      <div>
-        <div className="text-gray-200 leading-relaxed">{renderContent()}</div>
-        {typeof text === "string" && text.length > 300 && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-blue-500 hover:underline"
-          >
-            {isExpanded ? "Read Less" : "Read More"}
-          </button>
-        )}
-      </div>
-    );
-  };
+  const sortedItems = useFilters(
+    items,
+    debouncedSearchTerm,
+    selectedFilters,
+    RARITY.ORDER
+  );
 
   return (
     <div className="container mx-auto px-4">
@@ -208,7 +90,7 @@ const StarlightTable = () => {
           selectedFilters={selectedFilters}
           setSelectedFilters={setSelectedFilters}
           items={items}
-          categoryFilters={CATEGORY_FILTERS}
+          categoryFilters={ITEM_CATEGORY_FILTERS}
           classCustomOrder={CLASS_CUSTOM_ORDER}
         />
 
@@ -267,9 +149,7 @@ const StarlightTable = () => {
       <Modal
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
-        renderFields={(item, fields) =>
-          renderFields(item, FIELD_MAPPING[item.Type] || Object.keys(item))
-        }
+        activeCategory={activeCategory}
       />
     </div>
   );

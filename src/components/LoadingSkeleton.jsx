@@ -14,10 +14,7 @@ const LoadingSkeleton = ({ count = 8, className = "" }) => {
       {Array(count)
         .fill()
         .map((_, index) => (
-          <div
-            key={index}
-            className="bg-gray-700 p-4 rounded animate-pulse"
-          >
+          <div key={index} className="bg-gray-700 p-4 rounded animate-pulse">
             <div className="h-4 bg-gray-500 rounded mb-2"></div>
             <div className="h-3 bg-gray-600 rounded w-3/4"></div>
           </div>
