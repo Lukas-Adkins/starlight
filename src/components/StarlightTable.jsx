@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
+
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
-import { motion, AnimatePresence} from "framer-motion";
-import { Tooltip } from "react-tooltip";
+
+import { motion, AnimatePresence } from "framer-motion";
+
+import formatPrice from "../utils/formatPrice";
+import useBodyScrollLock from "../utils/useBodyScrollLock";
+import highlightWithTooltips from "../utils/highlightWithToolTips";
+
 import {
-  TRAIT_TOOLTIPS,
-  ALLOWED_TOOLTIP_CATEGORIES,
   MAX_CACHE_SIZE,
   CATEGORIES,
   RARITY_ORDER,
@@ -17,45 +21,17 @@ import {
   COLLECTION_NAME,
   ITEM_STALE_TIME,
   ITEM_CACHE_ITEM,
+  CATEGORY_FILTERS,
+  CLASS_CUSTOM_ORDER,
   getRarityColor,
 } from "../constants/appConfig";
 
-const formatPrice = (price) => {
-  if (!price || isNaN(price)) return "N/A"; // Handle invalid or missing prices
-  return price.toLocaleString("en-US"); // Format number with commas
-};
-
-const CATEGORY_FILTERS = {
-  "Ranged Weapon": [{ field: "Class", display: "Class" }, { field: "Special / Notes", display: "Special" }],
-  "Melee Weapon": [{ field: "Class", display: "Class" }, { field: "Special / Notes", display: "Special" }],
-  "Armor": [{ field: "Max Agility", display: "Max Agility" }, { field: "Covers", display: "Covers" }, { field: "Special / Notes", display: "Special" }],
-  "Cybernetic": [{ field: "Slots", display: "Slots" }],
-  "Mech Ranged Weapon": [{ field: "Class", display: "Class" }, { field: "Location", display: "Location" }, { field: "Special / Notes", display: "Special" }],
-  "Mech Melee Weapon": [{ field: "Class", display: "Class" }, { field: "Location", display: "Location" }, { field: "Special / Notes", display: "Special" }],
-  "Mech Utility": [{ field: "Location", display: "Location" }],
-  "Mech Engine": [{ field: "Location", display: "Location" }],
-};
-
-const CLASS_CUSTOM_ORDER = ["Light, Ranged", "Basic, Ranged", "Heavy, Ranged"];
-
-const useBodyScrollLock = (isLocked) => {
-  useEffect(() => {
-    const body = document.body;
-    if (isLocked) {
-      body.style.transition = "overflow 0.3s ease";
-      body.classList.add("overflow-hidden");
-    } else {
-      body.style.transition = "overflow 0.3s ease";
-      body.classList.remove("overflow-hidden");
-    }
-    return () => body.classList.remove("overflow-hidden");
-  }, [isLocked]);
-};
-
 const StarlightTable = () => {
-  const categories = [...CATEGORIES.types.sort((a, b) => {
-    return CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b);
-  })];
+  const categories = [
+    ...CATEGORIES.types.sort((a, b) => {
+      return CUSTOM_TYPE_ORDER.indexOf(a) - CUSTOM_TYPE_ORDER.indexOf(b);
+    }),
+  ];
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Ranged Weapon");
@@ -69,26 +45,35 @@ const StarlightTable = () => {
     const cacheKey = `categoryCache_${category}`; // Unique key for each category
     const cachedData = localStorage.getItem(cacheKey);
     const now = Date.now(); // Current timestamp
-
   
     if (cachedData) {
       try {
         const parsedData = JSON.parse(cachedData);
   
         // Check if timestamp exists and if the cache is still valid
-        if (parsedData.timestamp && now - parsedData.timestamp < MAX_CACHE_SIZE) {
+        if (
+          parsedData.timestamp &&
+          now - parsedData.timestamp < MAX_CACHE_SIZE
+        ) {
+          console.log("Cache hit:", parsedData);
           return parsedData.items; // Return valid cached items
         }
-  
-        // If no timestamp or cache is stale, fall through to fetch fresh data
       } catch (error) {
-        console.error("Error parsing cached data, fetching fresh data:", error);
+        console.error("Error parsing cached data, clearing cache:", error);
+        localStorage.removeItem(cacheKey); // Clear corrupted data
       }
     }
   
+    console.log("Cache miss, fetching fresh data...");
+    
     // Fetch fresh data from Firestore
-    const queryConstraints = [where("Type", "==", category === "Miscellaneous" ? "Misc" : category)];
-    const itemsQuery = query(collection(db, COLLECTION_NAME), ...queryConstraints);
+    const queryConstraints = [
+      where("Type", "==", category === "Miscellaneous" ? "Misc" : category),
+    ];
+    const itemsQuery = query(
+      collection(db, COLLECTION_NAME),
+      ...queryConstraints
+    );
     const snapshot = await getDocs(itemsQuery);
   
     const items = snapshot.docs.map((doc) => {
@@ -96,26 +81,28 @@ const StarlightTable = () => {
       return {
         id: doc.id,
         ...data,
-        Type: data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous",
+        Type:
+          data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous",
       };
     });
   
     // Save the result to localStorage with a timestamp
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({ timestamp: now, items })
-    );
+    localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, items }));
   
     return items;
   };  
 
-  const { data: items = [], isFetching, isError } = useQuery({
+  const {
+    data: items = [],
+    isFetching,
+    isError,
+  } = useQuery({
     queryKey: ["starlightItems", activeCategory],
     queryFn: () => fetchItemsByCategory(activeCategory),
     staleTime: ITEM_STALE_TIME,
     cacheTime: ITEM_CACHE_ITEM,
   });
-  
+
   const ItemCard = React.memo(({ item, onSelect }) => {
     return (
       <motion.div
@@ -133,7 +120,7 @@ const StarlightTable = () => {
           </h2>
           <p className="text-gray-500 text-sm">{item.Type}</p>
         </div>
-  
+
         {/* Right Column: Rarity and Price */}
         <div className="flex flex-col items-end justify-between">
           <p className={`text-sm font-medium ${getRarityColor(item.Rarity)}`}>
@@ -145,7 +132,7 @@ const StarlightTable = () => {
         </div>
       </motion.div>
     );
-  });  
+  });
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -161,33 +148,36 @@ const StarlightTable = () => {
   const filteredItems = React.useMemo(() => {
     if (!debouncedSearchTerm && Object.keys(selectedFilters).length === 0)
       return items;
-  
+
     return items.filter((item) => {
       // Match search term
       const matchesSearch = item.Name.toLowerCase().includes(
         debouncedSearchTerm.toLowerCase()
       );
-  
+
       // Match selected filters
-      const matchesFilters = Object.entries(selectedFilters).every(([key, value]) => {
-        if (!value) return true; // Ignore empty filters
-        if (key === "Special / Notes") {
-          const specialValues = item["Special / Notes"]
-            ? item["Special / Notes"]
-                .split(",")
-                .map((phrase) => phrase.trim().replace(/\s*\(.*\)/, "").toLowerCase())
-            : [];
-          return specialValues.includes(value.toLowerCase());
+      const matchesFilters = Object.entries(selectedFilters).every(
+        ([key, value]) => {
+          if (!value) return true; // Ignore empty filters
+          if (key === "Special / Notes") {
+            const specialValues = item["Special / Notes"]
+              ? item["Special / Notes"].split(",").map((phrase) =>
+                  phrase
+                    .trim()
+                    .replace(/\s*\(.*\)/, "")
+                    .toLowerCase()
+                )
+              : [];
+            return specialValues.includes(value.toLowerCase());
+          }
+          return item[key]?.toString().toLowerCase() === value.toLowerCase();
         }
-        return item[key]?.toString().toLowerCase() === value.toLowerCase();
-      });
-  
+      );
+
       return matchesSearch && matchesFilters;
     });
   }, [items, debouncedSearchTerm, selectedFilters]);
-  
-  
-  
+
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
       if (a.Type < b.Type) return -1;
@@ -196,36 +186,39 @@ const StarlightTable = () => {
       const rarityB = RARITY_ORDER[b.Rarity] || 100;
       return rarityA - rarityB;
     });
-  }, [filteredItems]);  
+  }, [filteredItems]);
 
   const renderCategoryFilters = () => {
     const filters = CATEGORY_FILTERS[activeCategory] || [];
-  
+
     const getOptionsForFilter = (field) => {
       if (field === "Class") {
         const uniqueClasses = Array.from(
           new Set(items.map((item) => item[field]).filter(Boolean))
         );
-  
+
         // Custom sort order for "Class"
-        return ["All (Show All)", ...uniqueClasses.sort((a, b) => {
-          const indexA = CLASS_CUSTOM_ORDER.indexOf(a);
-          const indexB = CLASS_CUSTOM_ORDER.indexOf(b);
-  
-          // If both are in the custom order, sort by index
-          if (indexA !== -1 && indexB !== -1) {
-            return indexA - indexB;
-          }
-  
-          // If one is in the custom order, it comes first
-          if (indexA !== -1) return -1;
-          if (indexB !== -1) return 1;
-  
-          // Fallback to alphabetical sorting for others
-          return a.localeCompare(b);
-        })];
+        return [
+          "All (Show All)",
+          ...uniqueClasses.sort((a, b) => {
+            const indexA = CLASS_CUSTOM_ORDER.indexOf(a);
+            const indexB = CLASS_CUSTOM_ORDER.indexOf(b);
+
+            // If both are in the custom order, sort by index
+            if (indexA !== -1 && indexB !== -1) {
+              return indexA - indexB;
+            }
+
+            // If one is in the custom order, it comes first
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+
+            // Fallback to alphabetical sorting for others
+            return a.localeCompare(b);
+          }),
+        ];
       }
-  
+
       if (field === "Special / Notes") {
         const uniquePhrases = Array.from(
           new Set(
@@ -238,17 +231,25 @@ const StarlightTable = () => {
               .filter(Boolean)
           )
         );
-        return ["All (Show All)", ...uniquePhrases.sort((a, b) => a.localeCompare(b))];
+        return [
+          "All (Show All)",
+          ...uniquePhrases.sort((a, b) => a.localeCompare(b)),
+        ];
       }
-  
-      return ["All (Show All)", ...Array.from(new Set(items.map((item) => item[field]).filter(Boolean))).sort((a, b) => {
-        if (!isNaN(a) && !isNaN(b)) {
-          return Number(a) - Number(b);
-        }
-        return a.localeCompare(b);
-      })];
+
+      return [
+        "All (Show All)",
+        ...Array.from(
+          new Set(items.map((item) => item[field]).filter(Boolean))
+        ).sort((a, b) => {
+          if (!isNaN(a) && !isNaN(b)) {
+            return Number(a) - Number(b);
+          }
+          return a.localeCompare(b);
+        }),
+      ];
     };
-  
+
     return (
       <div className="flex flex-wrap gap-4 items-center">
         {filters.map(({ field, display }) => (
@@ -259,7 +260,8 @@ const StarlightTable = () => {
               onChange={(e) =>
                 setSelectedFilters((prev) => ({
                   ...prev,
-                  [field]: e.target.value === "All (Show All)" ? "" : e.target.value, // Clear filter when "All" is selected
+                  [field]:
+                    e.target.value === "All (Show All)" ? "" : e.target.value, // Clear filter when "All" is selected
                 }))
               }
               className="p-2 bg-gray-800 border border-gray-700 text-white rounded w-full"
@@ -275,222 +277,168 @@ const StarlightTable = () => {
       </div>
     );
   };
-  
-  
-  
-  
-  
-  
-  
-  
-const renderFields = (item, fields) => {
 
-  const reorderedFields = fields
-  .filter((field) => field !== "Special / Notes" && field !== "Description")
-  .concat(["Special / Notes", "Description"]);
+  const renderFields = (item, fields) => {
+    const reorderedFields = fields
+      .filter((field) => field !== "Special / Notes" && field !== "Description")
+      .concat(["Special / Notes", "Description"]);
 
-  return reorderedFields.map((field) => {
-    const fullFieldName = FULL_FIELD_NAMES[field] || field;
+    return reorderedFields.map((field) => {
+      const fullFieldName = FULL_FIELD_NAMES[field] || field;
 
-    // Skip empty or undefined fields
-    if (!item[field] || item[field] === "N/A") return null;
+      // Skip empty or undefined fields
+      if (!item[field] || item[field] === "N/A") return null;
 
-    // Special case for 'Special / Notes'
-    if (field === "Special / Notes") {
-      const fieldValue =
-        typeof item[field] === "string" ? item[field] : String(item[field]);
+      // Special case for 'Special / Notes'
+      if (field === "Special / Notes") {
+        const fieldValue =
+          typeof item[field] === "string" ? item[field] : String(item[field]);
 
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
-        >
-          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
-          <DescriptionField text={fieldValue} enableTooltips={true} />
-        </div>
-      );
-    }
-
-    // Handle 'Description' without tooltips
-    if (field === "Description") {
-      const fieldValue =
-        typeof item[field] === "string" ? item[field] : String(item[field]);
-
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
-        >
-          <strong className="text-gray-400 block mb-2">{fullFieldName}:</strong>
-          <DescriptionField text={fieldValue} enableTooltips={false} />
-        </div>
-      );
-    }
-
-
-    // Special case for 'URL'
-    if (field === "Url") {
-      return (
-        <div
-          key={field}
-          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
-        >
-          <strong className="text-gray-400">{fullFieldName}:</strong>
-          <a
-            href={item[field]}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline flex items-center"
+        return (
+          <div
+            key={field}
+            className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
           >
-            Image <FaExternalLinkAlt className="ml-2" />
-          </a>
-        </div>
-      );
-    }
-
-    // Default field layout for other fields
-    return (
-      <div
-        key={field}
-        className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
-      >
-        <span className="font-semibold text-gray-400">{fullFieldName}:</span>
-        <span className="text-gray-100">
-          {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
-        </span>
-      </div>
-    );
-  });
-};
-
-
-
-
-// Component for handling expandable/collapsible text
-const DescriptionField = ({ text, enableTooltips = false }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-
-  const renderContent = () => {
-    if (typeof text === "string") {
-      const truncatedText =
-        text.length > 300 ? text.slice(0, 300) + "..." : text;
-
-      if (enableTooltips) {
-        return isExpanded
-          ? highlightWithTooltips(text)
-          : highlightWithTooltips(truncatedText);
-      } else {
-        return isExpanded ? text : truncatedText;
-      }
-    }
-
-    // If `text` is already JSX, render it directly
-    return text;
-  };
-
-  return (
-    <div>
-      <div className="text-gray-200 leading-relaxed">{renderContent()}</div>
-      {typeof text === "string" && text.length > 300 && (
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 text-blue-500 hover:underline"
-        >
-          {isExpanded ? "Read Less" : "Read More"}
-        </button>
-      )}
-    </div>
-  );
-};
-
-const highlightWithTooltips = (text) => {
-  if (!ALLOWED_TOOLTIP_CATEGORIES.includes(activeCategory)) return text;
-
-  if (typeof text !== "string") return text;
-
-  const sortedTraits = Object.keys(TRAIT_TOOLTIPS).sort((a, b) => b.length - a.length);
-
-  let tokens = [text];
-
-  sortedTraits.forEach((trait) => {
-    const tooltip = TRAIT_TOOLTIPS[trait];
-    const regex = new RegExp(`\\b${trait}\\b`, "gi");
-
-    tokens = tokens.flatMap((token) => {
-      if (typeof token === "string") {
-        return token.split(regex).flatMap((part, i, arr) =>
-          i < arr.length - 1
-            ? [
-                part,
-                <span
-                  key={`${trait}-${i}`}
-                  data-tooltip-id={`tooltip-${trait}`}
-                  data-tooltip-content={tooltip}
-                  className="border-b border-dashed border-gray-400 cursor-help"
-                >
-                  {trait}
-                  <Tooltip
-                    id={`tooltip-${trait}`}
-                    place="top" // Adjust position (e.g., top, bottom, left, right)
-                    style={{
-                      maxWidth: "90vw", // Constrain width on mobile
-                      whiteSpace: "normal", // Allow line breaks for longer text
-                      overflowWrap: "break-word", // Prevent text from breaking out
-                    }}
-                  />
-                </span>,
-              ]
-            : [part]
+            <strong className="text-gray-400 block mb-2">
+              {fullFieldName}:
+            </strong>
+            <DescriptionField text={fieldValue} enableTooltips={true} />
+          </div>
         );
       }
-      return token;
+
+      // Handle 'Description' without tooltips
+      if (field === "Description") {
+        const fieldValue =
+          typeof item[field] === "string" ? item[field] : String(item[field]);
+
+        return (
+          <div
+            key={field}
+            className="bg-gray-800 p-4 rounded-lg shadow-inner col-span-1 sm:col-span-2 text-gray-300"
+          >
+            <strong className="text-gray-400 block mb-2">
+              {fullFieldName}:
+            </strong>
+            <DescriptionField text={fieldValue} enableTooltips={false} />
+          </div>
+        );
+      }
+
+      // Special case for 'URL'
+      if (field === "Url") {
+        return (
+          <div
+            key={field}
+            className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex items-center gap-2"
+          >
+            <strong className="text-gray-400">{fullFieldName}:</strong>
+            <a
+              href={item[field]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline flex items-center"
+            >
+              Image <FaExternalLinkAlt className="ml-2" />
+            </a>
+          </div>
+        );
+      }
+
+      // Default field layout for other fields
+      return (
+        <div
+          key={field}
+          className="bg-gray-800 p-4 rounded-lg shadow-inner text-gray-300 flex justify-between items-center"
+        >
+          <span className="font-semibold text-gray-400">{fullFieldName}:</span>
+          <span className="text-gray-100">
+            {field === "Price" ? `₵${formatPrice(item[field])}` : item[field]}
+          </span>
+        </div>
+      );
     });
-  });
+  };
 
-  return <>{tokens}</>;
-};
+  // Component for handling expandable/collapsible text
+  const DescriptionField = ({ text, enableTooltips = false }) => {
+    const [isExpanded, setIsExpanded] = React.useState(false);
 
+    const renderContent = () => {
+      if (typeof text === "string") {
+        const truncatedText =
+          text.length > 300 ? text.slice(0, 300) + "..." : text;
 
+        if (enableTooltips) {
+          return isExpanded
+            ? highlightWithTooltips(text, activeCategory)
+            : highlightWithTooltips(truncatedText, activeCategory);
+        } else {
+          return isExpanded ? text : truncatedText;
+        }
+      }
+
+      // If `text` is already JSX, render it directly
+      return text;
+    };
+
+    return (
+      <div>
+        <div className="text-gray-200 leading-relaxed">{renderContent()}</div>
+        {typeof text === "string" && text.length > 300 && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-2 text-blue-500 hover:underline"
+          >
+            {isExpanded ? "Read Less" : "Read More"}
+          </button>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4">
       {/* Search Bar and Dropdown */}
       <div className="flex flex-wrap gap-4 items-center mb-4">
-  {/* Search Bar */}
-  <div className="flex-grow">
-    <div className="flex items-center relative">
-      <FaSearch className="absolute left-3 text-gray-400" />
-      <input
-        type="text"
-        placeholder="Search items..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded"
-      />
-    </div>
-  </div>
+        {/* Search Bar */}
+        <div className="flex-grow">
+          <div className="flex items-center relative">
+            <FaSearch className="absolute left-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded"
+            />
+          </div>
+        </div>
 
-  {/* Dynamic Filters */}
-  <div className="flex flex-wrap gap-4">{renderCategoryFilters()}</div>
+        {/* Dynamic Filters */}
+        <div className="flex flex-wrap gap-4">{renderCategoryFilters()}</div>
 
-  {/* Category Dropdown */}
-  <div>
-    <select
-      value={activeCategory}
-      onChange={(e) => setActiveCategory(e.target.value)}
-      className="p-2 bg-gray-800 border border-gray-700 text-white rounded"
-    >
-      {categories.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
+        {/* Category Dropdown */}
+        <div>
+          <select
+            value={activeCategory}
+            onChange={(e) => setActiveCategory(e.target.value)}
+            className="p-2 bg-gray-800 border border-gray-700 text-white rounded"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-
-      {isError && <p className="text-red-500">Error loading items. Please try again later.</p>}
+      {isError && (
+        <p className="text-red-500">
+          Error loading items. Please try again later.
+        </p>
+      )}
 
       <AnimatePresence mode="wait">
         {isFetching ? (
@@ -541,7 +489,6 @@ const highlightWithTooltips = (text) => {
         )}
       </AnimatePresence>
 
-
       {/* Modal */}
       {selectedItem && (
         <AnimatePresence>
@@ -567,7 +514,9 @@ const highlightWithTooltips = (text) => {
               </button>
 
               {/* Item Name */}
-              <h2 className="text-2xl font-bold text-white mb-6">{selectedItem.Name}</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {selectedItem.Name}
+              </h2>
 
               {/* Item Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -577,7 +526,8 @@ const highlightWithTooltips = (text) => {
                 ).map((field, index) =>
                   field ? (
                     React.isValidElement(field) &&
-                    (field.key === "Description" || field.key === "Special / Notes") ? (
+                    (field.key === "Description" ||
+                      field.key === "Special / Notes") ? (
                       // Wide fields (e.g., Description)
                       <div key={index} className="col-span-1 sm:col-span-2">
                         {field}
@@ -596,9 +546,7 @@ const highlightWithTooltips = (text) => {
         </AnimatePresence>
       )}
     </div>
-    
   );
-  
 };
 
 export default StarlightTable;

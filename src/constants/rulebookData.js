@@ -747,7 +747,7 @@ export const RULEBOOK_DATA = {
       title: "Introduction",
       sections: [
         {
-          heading: "About the Starlight System",
+          heading: "About",
           content: `This document serves as both a quick-reference guide and a rulebook for the Starlight science fiction roleplaying game system. It is a slimmer and more widely applicable version of the Dark Heresy 2e game system. Familiarity with DH2e is recommended.`,
         },
       ],
