@@ -2,28 +2,25 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaExternalLinkAlt } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../firebase/firebase";
-
 import { motion, AnimatePresence } from "framer-motion";
 
+import ItemCard from "./ItemCard";
+
+import fetchItemsByCategory from "../utils/fetchItemsByCategory";
 import formatPrice from "../utils/formatPrice";
 import useBodyScrollLock from "../utils/useBodyScrollLock";
 import highlightWithTooltips from "../utils/highlightWithToolTips";
 
 import {
-  MAX_CACHE_SIZE,
   CATEGORIES,
   RARITY_ORDER,
   FULL_FIELD_NAMES,
   FIELD_MAPPING,
   CUSTOM_TYPE_ORDER,
-  COLLECTION_NAME,
   ITEM_STALE_TIME,
   ITEM_CACHE_ITEM,
   CATEGORY_FILTERS,
   CLASS_CUSTOM_ORDER,
-  getRarityColor,
 } from "../constants/appConfig";
 
 const StarlightTable = () => {
@@ -41,57 +38,6 @@ const StarlightTable = () => {
 
   useBodyScrollLock(!!selectedItem);
 
-  const fetchItemsByCategory = async (category) => {
-    const cacheKey = `categoryCache_${category}`; // Unique key for each category
-    const cachedData = localStorage.getItem(cacheKey);
-    const now = Date.now(); // Current timestamp
-  
-    if (cachedData) {
-      try {
-        const parsedData = JSON.parse(cachedData);
-  
-        // Check if timestamp exists and if the cache is still valid
-        if (
-          parsedData.timestamp &&
-          now - parsedData.timestamp < MAX_CACHE_SIZE
-        ) {
-          console.log("Cache hit:", parsedData);
-          return parsedData.items; // Return valid cached items
-        }
-      } catch (error) {
-        console.error("Error parsing cached data, clearing cache:", error);
-        localStorage.removeItem(cacheKey); // Clear corrupted data
-      }
-    }
-  
-    console.log("Cache miss, fetching fresh data...");
-    
-    // Fetch fresh data from Firestore
-    const queryConstraints = [
-      where("Type", "==", category === "Miscellaneous" ? "Misc" : category),
-    ];
-    const itemsQuery = query(
-      collection(db, COLLECTION_NAME),
-      ...queryConstraints
-    );
-    const snapshot = await getDocs(itemsQuery);
-  
-    const items = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        Type:
-          data.Type === "Misc" ? "Miscellaneous" : data.Type || "Miscellaneous",
-      };
-    });
-  
-    // Save the result to localStorage with a timestamp
-    localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, items }));
-  
-    return items;
-  };  
-
   const {
     data: items = [],
     isFetching,
@@ -101,37 +47,6 @@ const StarlightTable = () => {
     queryFn: () => fetchItemsByCategory(activeCategory),
     staleTime: ITEM_STALE_TIME,
     cacheTime: ITEM_CACHE_ITEM,
-  });
-
-  const ItemCard = React.memo(({ item, onSelect }) => {
-    return (
-      <motion.div
-        key={item.id}
-        className="bg-gray-800 p-4 rounded shadow hover:shadow-lg hover:bg-gray-700 cursor-pointer flex justify-between transition-transform transform hover:scale-105"
-        onClick={() => onSelect(item)}
-      >
-        {/* Left Column: Item Name and Type */}
-        <div className="flex flex-col justify-between">
-          <h2
-            className="text-lg font-semibold text-white leading-tight break-words max-w-full sm:truncate sm:max-w-[150px] md:max-w-[200px]"
-            title={item.Name} // Show full title on hover
-          >
-            {item.Name}
-          </h2>
-          <p className="text-gray-500 text-sm">{item.Type}</p>
-        </div>
-
-        {/* Right Column: Rarity and Price */}
-        <div className="flex flex-col items-end justify-between">
-          <p className={`text-sm font-medium ${getRarityColor(item.Rarity)}`}>
-            {item.Rarity}
-          </p>
-          <p className="text-gray-400 text-sm mt-1">
-            {item.Price ? `₵${formatPrice(item.Price)}` : "Price: N/A"}
-          </p>
-        </div>
-      </motion.div>
-    );
   });
 
   useEffect(() => {
