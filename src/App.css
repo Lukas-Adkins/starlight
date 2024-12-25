@@ -87,3 +87,12 @@ summary:hover {
   background-color: #555; /* Highlight the item on hover */
   cursor: pointer;
 }
+
+.sidebar-link {
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+.sidebar-link:hover {
+  background-color: #2d3748;
+}
+
