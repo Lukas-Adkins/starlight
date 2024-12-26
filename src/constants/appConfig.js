@@ -31,7 +31,7 @@ export const RARITY = {
 
 export const ITEM_FULL_FIELD_NAMES = {
   Mag: "Magazine Size",
-  Rld: "Reload Time",
+  "Rld.": "Reload Time",
   RoF: "Rate of Fire",
   "Wt.": "Weight",
   Pen: "Penetration",
@@ -65,7 +65,7 @@ export const ITEM_FIELD_MAPPING = {
     "Dmg",
     "Pen",
     "Mag",
-    "Rld",
+    "Rld.",
     "Special / Notes",
     "Wt.",
     "Price",
@@ -113,7 +113,7 @@ export const ITEM_FIELD_MAPPING = {
     "Dmg",
     "Pen",
     "Mag",
-    "Rld",
+    "Rld.",
     "Special / Notes",
     "Wt.",
     "Price",
