@@ -182,7 +182,7 @@ export const ITEM_CATEGORY_FILTERS = {
     { field: "Special / Notes", display: "Special" },
   ],
   Armor: [
-    { field: "Max Agility", display: "Max Agility" },
+    { field: "Max Ag", display: "Max Agility" },
     { field: "Covers", display: "Covers" },
     { field: "Special / Notes", display: "Special" },
   ],
@@ -280,6 +280,7 @@ export const TRAIT_TOOLTIPS = {
   Autodoctor:
     "Onboard AI ensures wearer is Lightly Damaged for healing; injects drugs as needed.",
   Compact: "-20 to tests made to find.",
+  "Non-Lethal": "Excess damage converts to fatigue instead of critical hits."
 };
 
 export const ALLOWED_TOOLTIP_CATEGORIES = [

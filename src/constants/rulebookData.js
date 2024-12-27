@@ -578,7 +578,8 @@ export const TRAIT_INFO = {
                   { Trait: "Unbalanced", Effect: "Cannot use lightning attack. -10 to Parry." },
                   { Trait: "Unreliable", Effect: "Weapon jams on a roll of 91 or higher." },
                   { Trait: "Unwieldy", Effect: "Cannot be used to parry or make lightning attacks." },
-                  { Trait: "Vengeful", Effect: "Inflicts a critical hit on damage rolls of X or higher." }
+                  { Trait: "Vengeful", Effect: "Inflicts a critical hit on damage rolls of X or higher." },
+                  { Trait: "Non-Lethal", Effect: "This weapon does not kill when the target hits zero wounds, all damage beyond 0 wounds is delivered in fatigue gained as opposed to critical damage." }
               ],
           },
       },
