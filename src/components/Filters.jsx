@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { TRAIT_INFO } from "../constants/rulebookData";
 
 const Filters = ({
   activeCategory,
@@ -8,6 +9,10 @@ const Filters = ({
   categoryFilters,
   classCustomOrder,
 }) => {
+  const allowedTraits = TRAIT_INFO.sections.flatMap((section) =>
+    section.table.rows.map((row) => row.Trait)
+  );
+
   const getOptionsForFilter = (field) => {
     if (field === "Class") {
       const uniqueClasses = Array.from(
@@ -40,7 +45,8 @@ const Filters = ({
             )
             .filter(Boolean)
         )
-      );
+      ).filter((phrase) => allowedTraits.includes(phrase));
+
       return [
         "All (Show All)",
         ...uniquePhrases.sort((a, b) => a.localeCompare(b)),
