@@ -11,7 +11,7 @@ import Footer from "./components/Footer";
 import StarlightTable from "./components/StarlightTable"
 import Rulebook from "./components/Rulebook";
 
-import './App.css';
+import './index.css';
 
 // Initialize React Query's QueryClient
 const queryClient = new QueryClient();
