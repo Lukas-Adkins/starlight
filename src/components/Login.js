@@ -114,7 +114,9 @@ const Login = ({
         </p>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300">Email</label>
+          <label className="block text-sm font-medium text-gray-300">
+            Email
+          </label>
           <input
             type="email"
             className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -125,7 +127,9 @@ const Login = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300">Password</label>
+          <label className="block text-sm font-medium text-gray-300">
+            Password
+          </label>
           <input
             type="password"
             className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -155,7 +159,9 @@ const Login = ({
         <button
           onClick={isSignUp ? handleSignUp : handleSignIn}
           className={`w-full px-4 py-2 mt-4 rounded-md ${
-            isSignUp ? "bg-green-600 hover:bg-green-500" : "bg-blue-600 hover:bg-blue-500"
+            isSignUp
+              ? "bg-green-600 hover:bg-green-500"
+              : "bg-blue-600 hover:bg-blue-500"
           } text-white focus:outline-none focus:ring-2 focus:ring-blue-700`}
           disabled={isLocked && !isSignUp} // Only disable if locked and not in sign-up mode
         >

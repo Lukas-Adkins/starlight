@@ -9,7 +9,9 @@ import Characters from "./components/CharacterSelection";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import StarlightTable from "./components/StarlightTable"
-import './App.css';
+import Rulebook from "./components/Rulebook";
+
+import './index.css';
 
 // Initialize React Query's QueryClient
 const queryClient = new QueryClient();
@@ -44,6 +46,14 @@ function AnimatedRoutes() {
             <PageTransition>
               <Home />
             </PageTransition>
+          }
+        />
+        <Route
+          path="/rulebook/:section"
+          element={
+            <PageFastTransition>
+              <Rulebook />
+            </PageFastTransition>
           }
         />
         <Route
@@ -94,6 +104,23 @@ function PageTransition({ children }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function PageFastTransition({ children }) {
+  return (
+    <motion.div
+      key={children?.key || "default-transition-key"} // Fallback for missing keys
+      initial={{ opacity: 0, translateX: -10 }} // Use GPU-accelerated transform
+      animate={{ opacity: 1, translateX: 0 }}
+      exit={{ opacity: 0, translateX: 10 }}
+      transition={{
+        duration: 0.25, // Slightly slower for better perception
+        ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for a smoother curve
+      }}
     >
       {children}
     </motion.div>

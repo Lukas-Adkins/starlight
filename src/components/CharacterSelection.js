@@ -95,7 +95,11 @@ const CharacterSelection = () => {
   const openEditModal = (character) => {
     setEditingCharacter(character);
     setCharacterName(character.name);
-    setCharacterImageUrl(character.imageUrl === "/images/default-user.png" ? "" : character.imageUrl);
+    setCharacterImageUrl(
+      character.imageUrl === "/images/default-user.png"
+        ? ""
+        : character.imageUrl
+    );
     setShowModal(true);
   };
 
@@ -114,8 +118,8 @@ const CharacterSelection = () => {
 
   // Sort characters by creation date
   const sortedCharacters = characters
-  .slice()
-  .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    .slice()
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center py-8">
@@ -151,7 +155,9 @@ const CharacterSelection = () => {
                     transition={{ duration: 0.2 }}
                   />
                 </div>
-                <h2 className="text-xl font-semibold text-center">{character.name || "Unnamed Character"}</h2>
+                <h2 className="text-xl font-semibold text-center">
+                  {character.name || "Unnamed Character"}
+                </h2>
               </div>
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <button
@@ -193,7 +199,9 @@ const CharacterSelection = () => {
           setShowModal(true);
         }}
         className={`fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg transition text-white ${
-          characters.length >= MAX_CHARACTERS ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-500"
+          characters.length >= MAX_CHARACTERS
+            ? "bg-gray-600 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-500"
         }`}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -244,7 +252,11 @@ const CharacterSelection = () => {
                 />
                 <div className="flex justify-center space-x-4">
                   <button
-                    onClick={editingCharacter ? handleEditCharacter : handleCreateCharacter}
+                    onClick={
+                      editingCharacter
+                        ? handleEditCharacter
+                        : handleCreateCharacter
+                    }
                     className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 transition text-white"
                   >
                     {editingCharacter ? "Save Changes" : "Create"}

@@ -2,8 +2,8 @@ import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../firebase/firebase";
-import { signOut } from "firebase/auth"; // Import signOut function
-import { HomeIcon } from "@heroicons/react/solid"; // Example: Heroicons for Home Icon (requires `@heroicons/react`)
+import { signOut } from "firebase/auth";
+import { HomeIcon } from "@heroicons/react/solid";
 
 const NavBar = () => {
   const { user, setUser } = useAuth();
@@ -13,22 +13,19 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setUser(null); // Clear the user state
-  
-      // Delay navigation to allow the animation to complete
+      setUser(null);
       setTimeout(() => {
-        navigate("/login"); // Redirect to the login page
-      }, 300); // Match the Framer Motion exit animation duration
+        navigate("/login");
+      }, 300);
     } catch (error) {
       console.error("Logout error:", error.message);
     }
   };
 
-  // Helper function to check if a link is active
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gray-800 p-4 shadow-md">
+    <header className="bg-gray-800 p-4 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left Side: Home Icon + Feature Links */}
         <div className="flex items-center space-x-6">
@@ -36,6 +33,20 @@ const NavBar = () => {
           <Link to="/" className="text-gray-300 hover:text-blue-500 transition">
             <HomeIcon className="h-8 w-8" />
           </Link>
+
+          <div className="relative group">
+            {/* Rulebook Button */}
+            <Link
+              to="/rulebook/introduction"
+              className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
+                location.pathname.startsWith("/rulebook")
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              Rulebook
+            </Link>
+          </div>
 
           {/* Items Page Link */}
           <Link

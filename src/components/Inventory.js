@@ -6,11 +6,20 @@ import {
   useUpdateInventoryItem,
 } from "../firebase/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { useParams, useLocation} from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FaEdit, FaTrash, FaBox } from "react-icons/fa";
 
-const categories = ["Weapons", "Armor", "Magic Items", "Currencies", "Treasure", "Consumables", "Clothes", "Miscellaneous"];
+const categories = [
+  "Weapons",
+  "Armor",
+  "Magic Items",
+  "Currencies",
+  "Treasure",
+  "Consumables",
+  "Clothes",
+  "Miscellaneous",
+];
 
 // Helper Modal Reducer
 const initialModalState = { isOpen: false, mode: null, item: null };
@@ -168,10 +177,16 @@ const Inventory = () => {
   // Extract character name from state
   const characterName = location.state?.name || "Character";
 
-  const [modalState, dispatchModal] = useReducer(modalReducer, initialModalState);
+  const [modalState, dispatchModal] = useReducer(
+    modalReducer,
+    initialModalState
+  );
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const { data: inventory = [], isLoading } = useFetchInventory({ userId, characterId });
+  const { data: inventory = [], isLoading } = useFetchInventory({
+    userId,
+    characterId,
+  });
   const addItemMutation = useAddInventoryItem({ userId, characterId });
   const deleteItemMutation = useDeleteInventoryItem({ userId, characterId });
   const updateItemMutation = useUpdateInventoryItem({ userId, characterId });
@@ -185,7 +200,6 @@ const Inventory = () => {
     }
     dispatchModal({ type: "CLOSE" });
   };
-  
 
   const handleDeleteItem = (id) => {
     deleteItemMutation.mutate({ itemId: id });
@@ -204,7 +218,6 @@ const Inventory = () => {
         <p>Loading...</p>
       ) : (
         <div className="w-full max-w-6xl">
-
           {/* Category Tabs */}
           <div className="flex space-x-4 mb-6 overflow-x-auto">
             {["All", ...categories].map((cat) => (
@@ -224,14 +237,18 @@ const Inventory = () => {
 
           {/* Items Section */}
           {filteredInventory.length === 0 ? (
-            <p className="text-gray-400 text-center">No items found in this category.</p>
+            <p className="text-gray-400 text-center">
+              No items found in this category.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredInventory.map((item) => (
                 <InventoryItem
                   key={item.id}
                   item={item}
-                  onEdit={(item) => dispatchModal({ type: "OPEN_EDIT", payload: item })}
+                  onEdit={(item) =>
+                    dispatchModal({ type: "OPEN_EDIT", payload: item })
+                  }
                   onDelete={handleDeleteItem}
                 />
               ))}
