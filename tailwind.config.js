@@ -13,6 +13,7 @@ module.exports = {
           textSecondary: "#B0B0B0", // Secondary text color
           border: "#333333", // A contrasting border color
           highlight: "#505050", // For subtle highlights
+          field: "#1A1A1A"
         },
       },
     },

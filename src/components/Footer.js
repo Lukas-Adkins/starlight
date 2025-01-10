@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 p-4 text-center text-gray-400">
+    <footer className="bg-dark-surface p-4 text-center text-dark-textSecondary">
       © {new Date().getFullYear()} TTRPG Tools. All rights reserved.
     </footer>
   );

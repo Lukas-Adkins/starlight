@@ -38,32 +38,32 @@ const modalReducer = (state, action) => {
 
 const InventoryItem = ({ item, onEdit, onDelete }) => (
   <motion.div
-    className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 relative group"
+    className="bg-dark-surface p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 relative group"
     layout
   >
     {/* Item Name */}
     <div>
-      <h2 className="text-lg font-medium text-white">{item.itemName}</h2>
+      <h2 className="text-lg font-medium text-dark-textPrimary">{item.itemName}</h2>
     </div>
 
     {/* Quantity Badge */}
-    <div className="absolute top-4 right-4 bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm flex items-center">
-      <FaBox className="mr-1 text-gray-400" />
+    <div className="absolute top-4 right-4 bg-dark-highlight text-dark-textSecondary px-3 py-1 rounded-full text-sm flex items-center">
+      <FaBox className="mr-1 text-dark-textPrimary" />
       <span>{item.quantity}</span>
     </div>
 
     {/* Edit & Delete Buttons */}
-    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900 bg-opacity-50 rounded-lg">
+    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-dark-background bg-opacity-50 rounded-lg">
       <button
         onClick={() => onEdit(item)}
-        className="text-blue-500 hover:text-blue-400 transition-colors duration-200 mx-2"
+        className="text-dark-primary hover:text-dark-highlight transition-colors duration-200 mx-2"
         title="Edit"
       >
         <FaEdit size={24} />
       </button>
       <button
         onClick={() => onDelete(item.id)}
-        className="text-red-500 hover:text-red-400 transition-colors duration-200 mx-2"
+        className="text-dark-error hover:text-dark-highlight transition-colors duration-200 mx-2"
         title="Delete"
       >
         <FaTrash size={24} />
@@ -71,6 +71,7 @@ const InventoryItem = ({ item, onEdit, onDelete }) => (
     </div>
   </motion.div>
 );
+
 const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -91,7 +92,6 @@ const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
   }, [isOpen, mode, item]);
 
   const handleSave = () => {
-    console.log("Saving Item:", { itemName, quantity, category }); // Debugging
     if (!category) {
       alert("Please select a category.");
       return;
@@ -106,13 +106,13 @@ const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+          className="fixed inset-0 bg-dark-background bg-opacity-75 flex items-center justify-center"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
         >
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-dark-surface p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-semibold text-dark-textPrimary mb-4">
               {mode === "add" ? "Add New Item" : "Edit Item"}
             </h2>
             <input
@@ -120,7 +120,7 @@ const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
               placeholder="Item Name"
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
-              className="w-full p-2 mb-4 bg-gray-700 text-white rounded-md"
+              className="w-full p-2 mb-4 bg-dark-highlight text-dark-textPrimary rounded-md"
             />
             <input
               type="number"
@@ -128,15 +128,12 @@ const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
               min="1"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="w-full p-2 mb-4 bg-gray-700 text-white rounded-md"
+              className="w-full p-2 mb-4 bg-dark-highlight text-dark-textPrimary rounded-md"
             />
             <select
               value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                console.log("Selected Category:", e.target.value); // Debugging
-              }}
-              className="w-full p-2 mb-4 bg-gray-700 text-white rounded-md"
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full p-2 mb-4 bg-dark-highlight text-dark-textPrimary rounded-md"
             >
               <option value="" disabled>
                 Select a Category
@@ -150,13 +147,13 @@ const Modal = ({ isOpen, mode, item, onClose, onSave }) => {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleSave}
-                className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 text-white"
+                className="bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-highlight text-dark-textPrimary"
               >
                 Save
               </button>
               <button
                 onClick={onClose}
-                className="bg-gray-600 px-4 py-2 rounded-md hover:bg-gray-500 text-white"
+                className="bg-dark-highlight px-4 py-2 rounded-md hover:bg-dark-surface text-dark-textPrimary"
               >
                 Cancel
               </button>
@@ -192,7 +189,6 @@ const Inventory = () => {
   const updateItemMutation = useUpdateInventoryItem({ userId, characterId });
 
   const handleSaveItem = (itemData) => {
-    console.log("Item Data Sent to API:", itemData); // Debugging
     if (modalState.mode === "add") {
       addItemMutation.mutate(itemData);
     } else if (modalState.mode === "edit") {
@@ -211,11 +207,11 @@ const Inventory = () => {
       : inventory.filter((item) => item.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center py-8">
+    <div className="min-h-screen bg-dark-background text-dark-textPrimary flex flex-col items-center py-8">
       <h1 className="text-4xl font-bold mb-8">{`${characterName}'s Inventory`}</h1>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p className="text-dark-textSecondary">Loading...</p>
       ) : (
         <div className="w-full max-w-6xl">
           {/* Category Tabs */}
@@ -226,8 +222,8 @@ const Inventory = () => {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-md ${
                   activeCategory === cat
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    ? "bg-dark-primary text-dark-textPrimary"
+                    : "bg-dark-surface text-dark-textSecondary hover:bg-dark-highlight"
                 }`}
               >
                 {cat}
@@ -237,7 +233,7 @@ const Inventory = () => {
 
           {/* Items Section */}
           {filteredInventory.length === 0 ? (
-            <p className="text-gray-400 text-center">
+            <p className="text-dark-textSecondary text-center">
               No items found in this category.
             </p>
           ) : (
@@ -260,7 +256,7 @@ const Inventory = () => {
       {/* Add Item Button */}
       <button
         onClick={() => dispatchModal({ type: "OPEN_ADD" })}
-        className="fixed bottom-8 right-8 bg-blue-600 px-6 py-3 rounded-full shadow-lg hover:bg-blue-500 text-white"
+        className="fixed bottom-8 right-8 bg-dark-primary px-6 py-3 rounded-full shadow-lg hover:bg-dark-highlight text-dark-textPrimary"
       >
         + Add Item
       </button>

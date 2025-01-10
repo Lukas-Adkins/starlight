@@ -122,18 +122,18 @@ const CharacterSelection = () => {
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center py-8">
+    <div className="min-h-screen bg-dark-background text-dark-textPrimary flex flex-col items-center py-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Your Characters</h1>
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-dark-primary"></div>
         </div>
       ) : sortedCharacters.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
           {sortedCharacters.map((character) => (
             <div
               key={character.id}
-              className="bg-gray-800 p-6 rounded-lg shadow-lg relative flex flex-col items-center group"
+              className="bg-dark-surface p-6 rounded-lg shadow-lg relative flex flex-col items-center group"
             >
               <div
                 onClick={() =>
@@ -147,7 +147,7 @@ const CharacterSelection = () => {
                   <motion.img
                     src={character.imageUrl || "/images/default-user.png"}
                     alt={character.name || "Default User"}
-                    className="w-full h-full object-cover rounded-full border-2 border-gray-600"
+                    className="w-full h-full object-cover rounded-full border-2 border-dark-border"
                     onError={(e) => {
                       e.target.src = "/images/default-user.png";
                     }}
@@ -165,7 +165,7 @@ const CharacterSelection = () => {
                     e.stopPropagation();
                     openEditModal(character);
                   }}
-                  className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-500 transition"
+                  className="bg-dark-highlight text-dark-textPrimary px-3 py-1 rounded-md hover:bg-dark-primary transition"
                 >
                   Edit
                 </button>
@@ -174,7 +174,7 @@ const CharacterSelection = () => {
                     e.stopPropagation();
                     openDeleteConfirmModal(character);
                   }}
-                  className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-500 transition"
+                  className="bg-dark-error text-dark-textPrimary px-3 py-1 rounded-md hover:bg-dark-highlight transition"
                 >
                   Delete
                 </button>
@@ -184,7 +184,7 @@ const CharacterSelection = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center flex-grow h-64">
-          <p className="text-lg font-medium text-gray-400 mb-4 text-center">
+          <p className="text-lg font-medium text-dark-textSecondary mb-4 text-center">
             No characters found. Create a new character to get started!
           </p>
         </div>
@@ -198,10 +198,10 @@ const CharacterSelection = () => {
           }
           setShowModal(true);
         }}
-        className={`fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg transition text-white ${
+        className={`fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg transition text-dark-textPrimary ${
           characters.length >= MAX_CHARACTERS
-            ? "bg-gray-600 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-500"
+            ? "bg-dark-highlight cursor-not-allowed"
+            : "bg-dark-primary hover:bg-dark-highlight"
         }`}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,7 +217,7 @@ const CharacterSelection = () => {
         {showModal && (
           <>
             <motion.div
-              className="fixed inset-0 bg-black bg-opacity-75"
+              className="fixed inset-0 bg-dark-background bg-opacity-75"
               initial="hidden"
               animate="visible"
               exit="exit"
@@ -232,8 +232,8 @@ const CharacterSelection = () => {
               variants={modalVariants}
               transition={{ duration: 0.3 }}
             >
-              <div className="bg-gray-800 p-6 rounded-lg text-center shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
+              <div className="bg-dark-surface p-6 rounded-lg text-center shadow-lg">
+                <h2 className="text-xl font-semibold text-dark-textPrimary mb-4">
                   {editingCharacter ? "Edit Character" : "Create New Character"}
                 </h2>
                 <input
@@ -241,14 +241,14 @@ const CharacterSelection = () => {
                   placeholder="Character Name"
                   value={characterName}
                   onChange={(e) => setCharacterName(e.target.value)}
-                  className="w-full p-2 mb-4 rounded-md bg-gray-700 text-white focus:outline-none"
+                  className="w-full p-2 mb-4 rounded-md bg-dark-highlight text-dark-textPrimary focus:outline-none"
                 />
                 <input
                   type="text"
                   placeholder="Image URL (optional)"
                   value={characterImageUrl}
                   onChange={(e) => setCharacterImageUrl(e.target.value)}
-                  className="w-full p-2 mb-4 rounded-md bg-gray-700 text-white focus:outline-none"
+                  className="w-full p-2 mb-4 rounded-md bg-dark-highlight text-dark-textPrimary focus:outline-none"
                 />
                 <div className="flex justify-center space-x-4">
                   <button
@@ -257,7 +257,7 @@ const CharacterSelection = () => {
                         ? handleEditCharacter
                         : handleCreateCharacter
                     }
-                    className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 transition text-white"
+                    className="bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-highlight transition text-dark-textPrimary"
                   >
                     {editingCharacter ? "Save Changes" : "Create"}
                   </button>
@@ -267,7 +267,7 @@ const CharacterSelection = () => {
                       setEditingCharacter(null);
                       setCharacterImageUrl("");
                     }}
-                    className="bg-gray-600 px-4 py-2 rounded-md hover:bg-gray-500 transition text-white"
+                    className="bg-dark-highlight px-4 py-2 rounded-md hover:bg-dark-surface transition text-dark-textPrimary"
                   >
                     Cancel
                   </button>
@@ -282,7 +282,7 @@ const CharacterSelection = () => {
       <AnimatePresence>
         {showDeleteConfirm && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+            className="fixed inset-0 bg-dark-background bg-opacity-75 flex items-center justify-center"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -290,26 +290,26 @@ const CharacterSelection = () => {
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="bg-gray-800 p-6 rounded-lg text-center shadow-lg"
+              className="bg-dark-surface p-6 rounded-lg text-center shadow-lg"
               initial="hidden"
               animate="visible"
               exit="exit"
               variants={modalVariants}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-xl font-semibold text-white mb-4">
+              <h2 className="text-xl font-semibold text-dark-textPrimary mb-4">
                 Are you sure you want to delete {characterToDelete?.name}?
               </h2>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={handleDeleteCharacter}
-                  className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-500 transition text-white"
+                  className="bg-dark-error px-4 py-2 rounded-md hover:bg-dark-highlight transition text-dark-textPrimary"
                 >
                   Delete
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="bg-gray-600 px-4 py-2 rounded-md hover:bg-gray-500 transition text-white"
+                  className="bg-dark-highlight px-4 py-2 rounded-md hover:bg-dark-surface transition text-dark-textPrimary"
                 >
                   Cancel
                 </button>

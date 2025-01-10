@@ -76,16 +76,16 @@ const Login = ({
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-900"
+      className="min-h-screen flex items-center justify-center bg-dark-background"
       onKeyPress={handleKeyPress} // Listen for keypress
     >
-      <div className="w-full max-w-md p-8 space-y-4 bg-gray-800 rounded-lg shadow-lg">
+      <div className="w-full max-w-md p-8 space-y-4 bg-dark-surface rounded-lg shadow-lg">
         {/* Message Container with Fixed Height */}
         <div className="h-12">
           {/* Flash Message */}
           {flashMessage && (
             <div
-              className={`bg-red-500 text-white text-center py-2 rounded-md transition-opacity duration-500 ${
+              className={`bg-dark-error text-dark-textPrimary text-center py-2 rounded-md transition-opacity duration-500 ${
                 fadeOutFlash ? "opacity-0" : "opacity-100"
               }`}
             >
@@ -95,7 +95,7 @@ const Login = ({
           {/* Error Message */}
           {error && (
             <div
-              className={`bg-red-600 text-white text-center py-2 rounded-md transition-opacity duration-500 ${
+              className={`bg-dark-error text-dark-textPrimary text-center py-2 rounded-md transition-opacity duration-500 ${
                 fadeOutError ? "opacity-0" : "opacity-100"
               }`}
             >
@@ -104,22 +104,22 @@ const Login = ({
           )}
         </div>
 
-        <h2 className="text-3xl font-bold text-center text-white">
+        <h2 className="text-3xl font-bold text-center text-dark-textPrimary">
           {isSignUp ? "Sign Up" : "Login"}
         </h2>
-        <p className="text-center text-gray-400">
+        <p className="text-center text-dark-textSecondary">
           {isSignUp
             ? "Create your account to get started."
             : "Enter your credentials to continue"}
         </p>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-sm font-medium text-dark-textSecondary">
             Email
           </label>
           <input
             type="email"
-            className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 mt-2 bg-dark-highlight text-dark-textPrimary rounded-md focus:outline-none focus:ring-2 focus:ring-dark-primary"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -127,12 +127,12 @@ const Login = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-sm font-medium text-dark-textSecondary">
             Password
           </label>
           <input
             type="password"
-            className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 mt-2 bg-dark-highlight text-dark-textPrimary rounded-md focus:outline-none focus:ring-2 focus:ring-dark-primary"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -150,7 +150,7 @@ const Login = ({
               onChange={(e) => setRememberMe(e.target.checked)}
               disabled={isLocked} // Disable checkbox if locked
             />
-            <label htmlFor="rememberMe" className="text-gray-300 text-sm">
+            <label htmlFor="rememberMe" className="text-dark-textSecondary text-sm">
               Remember Me
             </label>
           </div>
@@ -160,9 +160,9 @@ const Login = ({
           onClick={isSignUp ? handleSignUp : handleSignIn}
           className={`w-full px-4 py-2 mt-4 rounded-md ${
             isSignUp
-              ? "bg-green-600 hover:bg-green-500"
-              : "bg-blue-600 hover:bg-blue-500"
-          } text-white focus:outline-none focus:ring-2 focus:ring-blue-700`}
+              ? "bg-dark-primary hover:bg-dark-highlight"
+              : "bg-dark-primary hover:bg-dark-highlight"
+          } text-dark-textPrimary focus:outline-none focus:ring-2 focus:ring-dark-primary`}
           disabled={isLocked && !isSignUp} // Only disable if locked and not in sign-up mode
         >
           {isSignUp
@@ -173,20 +173,20 @@ const Login = ({
         </button>
 
         {isSignUp ? (
-          <p className="text-center text-gray-400 text-sm mt-4">
+          <p className="text-center text-dark-textSecondary text-sm mt-4">
             Already have an account?{" "}
             <span
-              className="text-blue-400 cursor-pointer hover:underline"
+              className="text-dark-primary cursor-pointer hover:underline"
               onClick={() => setIsSignUp(false)}
             >
               Log in
             </span>
           </p>
         ) : (
-          <p className="text-center text-gray-400 text-sm mt-4">
+          <p className="text-center text-dark-textSecondary text-sm mt-4">
             Don't have an account?{" "}
             <span
-              className="text-blue-400 cursor-pointer hover:underline"
+              className="text-dark-primary cursor-pointer hover:underline"
               onClick={() => setIsSignUp(true)}
             >
               Sign up

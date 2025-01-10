@@ -45,7 +45,8 @@ const Rulebook = () => {
     } else {
       document.removeEventListener("mousedown", closeSidebarOnClickOutside);
     }
-    return () => document.removeEventListener("mousedown", closeSidebarOnClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", closeSidebarOnClickOutside);
   }, [isSidebarOpen]);
 
   const sectionData = RULEBOOK_DATA[section?.toLowerCase()];
@@ -58,34 +59,33 @@ const Rulebook = () => {
         </p>
       );
     }
-
     if (Array.isArray(sectionData.sections)) {
       const headingCount = sectionData.sections.filter(
         (sec) => sec.heading
       ).length;
-
       return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 py-10">
           {sectionData.sections.map((sec, idx) => {
             const anchorId = `section-${idx}`;
             const isTable = !!sec.table;
             const isSoleBox = headingCount < 2;
-
             return (
               <div
                 key={idx}
                 id={anchorId}
-                className={`$${
+                className={`${
                   isSoleBox || isTable ? "lg:col-span-2" : ""
-                } space-y-6 p-6 bg-dark-surface rounded-lg shadow-md border border-dark-border`}
+                } space-y-6 p-6 bg-dark-field rounded-lg shadow-md border border-dark-border`}
               >
                 {sec.heading && (
-                  <h3 className="text-3xl font-extrabold text-dark-textPrimary border-b border-dark-highlight pb-3">
+                  <h3 className="text-3xl font-extrabold text-dark-textPrimary border-b border-dark-border pb-3">
                     {sec.heading}
                   </h3>
                 )}
                 {sec.content && (
-                  <p className="text-dark-textSecondary leading-relaxed">{sec.content}</p>
+                  <p className="text-dark-textSecondary leading-relaxed">
+                    {sec.content}
+                  </p>
                 )}
                 {sec.table && renderTable(sec.table)}
               </div>
@@ -94,42 +94,39 @@ const Rulebook = () => {
         </div>
       );
     }
-
     if (typeof sectionData === "string") {
       return (
-        <p className="text-dark-textSecondary leading-relaxed max-w-4xl mx-auto px-6 py-8 bg-dark-surface rounded-lg shadow-md border border-dark-border">
+        <p className="text-dark-textSecondary leading-relaxed max-w-4xl mx-auto px-6 py-8 bg-dark-field rounded-lg shadow-md border border-dark-border">
           {sectionData}
         </p>
       );
     }
-
     if (sectionData.table) {
       return (
         <div className="lg:col-span-2">{renderTable(sectionData.table)}</div>
       );
     }
-
     return (
       <p className="text-lg text-dark-textSecondary italic text-center">
         Invalid section format.
       </p>
     );
   };
-
   const renderTable = (tableData) => {
     if (!tableData?.columns || !tableData?.rows) {
-      return <p className="text-dark-textSecondary italic">Invalid table data.</p>;
+      return (
+        <p className="text-dark-textSecondary italic">Invalid table data.</p>
+      );
     }
-
     return (
-      <div className="overflow-x-auto bg-dark-background rounded-lg shadow-lg">
+      <div className="overflow-x-auto bg-dark-surface rounded-lg shadow-lg">
         <table className="w-full border-collapse text-dark-textSecondary border border-dark-border">
           <thead className="sticky top-0 bg-gradient-to-r from-dark-background via-dark-surface to-dark-background">
             <tr>
               {tableData.columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className="px-4 py-3 text-left font-bold border-b border-dark-highlight text-dark-textPrimary"
+                  className="px-4 py-3 text-left font-bold border-b border-dark-border text-dark-textPrimary"
                 >
                   {col}
                 </th>
@@ -139,7 +136,10 @@ const Rulebook = () => {
           <tbody>
             {tableData.rows.length === 0 ? (
               <tr>
-                <td colSpan={tableData.columns.length} className="px-4 py-3 text-center">
+                <td
+                  colSpan={tableData.columns.length}
+                  className="px-4 py-3 text-center"
+                >
                   No data available.
                 </td>
               </tr>
@@ -148,7 +148,7 @@ const Rulebook = () => {
                 <tr
                   key={rowIdx}
                   className={`${
-                    rowIdx % 2 === 0 ? "bg-dark-surface" : "bg-dark-highlight"
+                    rowIdx % 2 === 0 ? "bg-dark-field" : "bg-dark-highlight"
                   } hover:bg-dark-surface transition duration-300 ease-in-out`}
                 >
                   {Object.values(row).map((value, colIdx) => (
@@ -162,7 +162,8 @@ const Rulebook = () => {
                     </td>
                   ))}
                 </tr>
-              )))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -189,7 +190,8 @@ const Rulebook = () => {
         </h2>
         <ul className="space-y-2">
           {Object.keys(RULEBOOK_DATA).map((key) => {
-            const isCurrentSection = section?.toLowerCase() === key.toLowerCase();
+            const isCurrentSection =
+              section?.toLowerCase() === key.toLowerCase();
             const sectionData = RULEBOOK_DATA[key];
             const hasSubsections =
               sectionData?.sections && Array.isArray(sectionData.sections);
@@ -216,7 +218,8 @@ const Rulebook = () => {
                     <ul className="pl-4 space-y-1 mt-2">
                       {sectionData.sections.map((subSection, idx) => {
                         const anchorId = `section-${idx}`;
-                        const isCurrentSubSection = window.location.hash === `#${anchorId}`;
+                        const isCurrentSubSection =
+                          window.location.hash === `#${anchorId}`;
 
                         return (
                           <li key={idx}>
@@ -224,13 +227,17 @@ const Rulebook = () => {
                               href={`#${anchorId}`}
                               onClick={(e) => {
                                 e.preventDefault();
-                                const target = document.getElementById(anchorId);
+                                const target =
+                                  document.getElementById(anchorId);
                                 const offset = 70; // Adjust for fixed header
                                 const position =
                                   target.getBoundingClientRect().top +
                                   window.scrollY -
                                   offset;
-                                window.scrollTo({ top: position, behavior: "smooth" });
+                                window.scrollTo({
+                                  top: position,
+                                  behavior: "smooth",
+                                });
                               }}
                               className={`block px-4 py-2 rounded-md transition ${
                                 isCurrentSubSection

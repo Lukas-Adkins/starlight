@@ -77,7 +77,7 @@ const Filters = ({
                   e.target.value === "All (Show All)" ? "" : e.target.value,
               }))
             }
-            className="p-2 bg-gray-800 border border-gray-700 text-white rounded w-full"
+            className="p-2 bg-dark-surface border border-dark-border text-dark-textPrimary rounded w-full"
           >
             {getOptionsForFilter(field).map((option) => (
               <option key={option} value={option}>

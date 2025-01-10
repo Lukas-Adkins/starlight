@@ -73,13 +73,13 @@ const StarlightTable = () => {
         {/* Search Bar */}
         <div className="flex-grow">
           <div className="flex items-center relative">
-            <FaSearch className="absolute left-3 text-gray-400" />
+            <FaSearch className="absolute left-3 text-dark-textSecondary" />
             <input
               type="text"
               placeholder="Search items..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 p-2 bg-gray-800 border border-gray-700 text-white rounded"
+              className="w-full pl-10 p-2 bg-dark-field border border-dark-border text-dark-textPrimary rounded"
             />
           </div>
         </div>
@@ -99,7 +99,7 @@ const StarlightTable = () => {
           <select
             value={activeCategory}
             onChange={(e) => setActiveCategory(e.target.value)}
-            className="p-2 bg-gray-800 border border-gray-700 text-white rounded"
+            className="p-2 bg-dark-field border border-dark-border text-dark-textPrimary rounded"
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -111,7 +111,7 @@ const StarlightTable = () => {
       </div>
 
       {isError && (
-        <p className="text-red-500">
+        <p className="text-dark-error">
           Error loading items. Please try again later.
         </p>
       )}
@@ -126,7 +126,7 @@ const StarlightTable = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="text-gray-400 text-center"
+            className="text-dark-textSecondary text-center"
           >
             No items match your search or category.
           </motion.div>

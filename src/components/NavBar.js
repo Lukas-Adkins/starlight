@@ -25,12 +25,12 @@ const NavBar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gray-800 p-4 shadow-md z-55">
+    <header className="bg-dark-background p-4 shadow-md z-55">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left Side: Home Icon + Feature Links */}
         <div className="flex items-center space-x-6">
           {/* Home Icon */}
-          <Link to="/" className="text-gray-300 hover:text-blue-500 transition">
+          <Link to="/" className="text-dark-textSecondary hover:text-dark-primary transition">
             <HomeIcon className="h-8 w-8" />
           </Link>
 
@@ -40,8 +40,8 @@ const NavBar = () => {
               to="/rulebook/introduction"
               className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
                 location.pathname.startsWith("/rulebook")
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-gray-300 hover:bg-gray-700"
+                  ? "bg-dark-primary text-dark-textPrimary shadow-lg"
+                  : "text-dark-textSecondary hover:bg-dark-surface"
               }`}
             >
               Rulebook
@@ -53,8 +53,8 @@ const NavBar = () => {
             to="/items"
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
               isActive("/items")
-                ? "bg-blue-600 text-white shadow-lg"
-                : "text-gray-300 hover:bg-gray-700"
+                ? "bg-dark-primary text-dark-textPrimary shadow-lg"
+                : "text-dark-textSecondary hover:bg-dark-surface"
             }`}
           >
             Items
@@ -65,8 +65,8 @@ const NavBar = () => {
             to="/characters"
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
               isActive("/characters")
-                ? "bg-blue-600 text-white shadow-lg"
-                : "text-gray-300 hover:bg-gray-700"
+                ? "bg-dark-primary text-dark-textPrimary shadow-lg"
+                : "text-dark-textSecondary hover:bg-dark-surface"
             }`}
           >
             Characters
@@ -78,15 +78,15 @@ const NavBar = () => {
           {user ? (
             <button
               onClick={handleLogout}
-              className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-500 text-white transition"
+              className="bg-dark-error px-4 py-2 rounded-md hover:bg-dark-highlight text-dark-textPrimary transition"
             >
               Logout
             </button>
           ) : (
             <Link
               to="/login"
-              className={`bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 transition ${
-                isActive("/login") ? "text-white font-bold" : "text-white"
+              className={`bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-highlight transition ${
+                isActive("/login") ? "text-dark-textPrimary font-bold" : "text-dark-textPrimary"
               }`}
             >
               Login

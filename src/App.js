@@ -8,7 +8,7 @@ import Inventory from "./components/Inventory";
 import Characters from "./components/CharacterSelection";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
-import StarlightTable from "./components/StarlightTable"
+import StarlightTable from "./components/StarlightTable";
 import Rulebook from "./components/Rulebook";
 
 import './index.css';
@@ -21,7 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+          <div className="min-h-screen flex flex-col bg-dark-background text-dark-textPrimary">
             <NavBar />
             <main className="flex-grow container mx-auto p-4">
               <AnimatedRoutes />
@@ -130,17 +130,17 @@ function PageFastTransition({ children }) {
 function Home() {
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-dark-background text-dark-textPrimary">
       <div className="text-center max-w-2xl">
         <h1 className="text-5xl font-bold mb-6">Welcome to Starlight!</h1>
-        <p className="text-lg text-gray-400 mb-8">
+        <p className="text-lg text-dark-textSecondary mb-8">
           Starlight is your go-to tool for exploring the Starlight setting and game system.
         </p>
       </div>
       <div className="mt-12">
         <a
           href="/items"
-          className="px-6 py-3 bg-blue-600 text-white text-lg rounded hover:bg-blue-500 transition-colors"
+          className="px-6 py-3 bg-dark-primary text-dark-textPrimary text-lg rounded hover:bg-dark-highlight transition-colors"
         >
           Explore Items
         </a>
@@ -155,8 +155,8 @@ const ProtectedRoute = ({ children }) => {
   // Show a loading spinner while the auth state is being determined
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-dark-background text-dark-textPrimary">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-dark-primary"></div>
       </div>
     );
   }
