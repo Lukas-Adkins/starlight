@@ -183,7 +183,7 @@ const Rulebook = () => {
         className={`fixed top-0 left-0 w-64 bg-dark-surface p-4 h-full z-40 transform transition-transform duration-300 ease-in-out shadow-lg ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:sticky lg:top-0 overflow-y-auto`}
-        style={{ height: "100vh" }}
+        style={{ height: "100vh", paddingTop: "20px" }}
       >
         <h2 className="text-lg font-bold text-dark-textPrimary mb-4">
           Table of Contents

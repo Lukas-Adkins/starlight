@@ -4,16 +4,16 @@ module.exports = {
     extend: {
       colors: {
         dark: {
-          background: "#121212", // Dark background
-          surface: "#1E1E1E",    // Slightly lighter for surfaces
-          primary: "#BB86FC",   // Soft purple for primary accents
-          secondary: "#03DAC6", // Teal for secondary accents
-          error: "#CF6679",     // Red for errors
-          textPrimary: "#FFFFFF", // Main text color
-          textSecondary: "#B0B0B0", // Secondary text color
-          border: "#333333", // A contrasting border color
-          highlight: "#505050", // For subtle highlights
-          field: "#1A1A1A"
+          background: "#121212",  // Dark background
+          surface: "#1E1E1E",     // Slightly lighter surface
+          primary: "#BB86FC",     // Soft purple for primary accents
+          secondary: "#4CAF50",   // Muted green for secondary accents
+          error: "#CF6679",       // Red for errors
+          textPrimary: "#E0E0E0", // Light text for better contrast
+          textSecondary: "#B0B0B0", // Muted secondary text
+          border: "#333333",      // Contrasting border color
+          highlight: "#444444",   // A slightly muted highlight for subtle emphasis
+          field: "#1A1A1A",       // A slightly lighter shade for input fields
         },
       },
     },
