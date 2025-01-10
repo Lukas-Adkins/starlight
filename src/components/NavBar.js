@@ -25,7 +25,7 @@ const NavBar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gray-800 p-4 shadow-md z-50">
+    <header className="bg-gray-800 p-4 shadow-md z-55">
       <div className="container mx-auto flex justify-between items-center">
         {/* Left Side: Home Icon + Feature Links */}
         <div className="flex items-center space-x-6">

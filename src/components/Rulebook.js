@@ -162,8 +162,7 @@ const Rulebook = () => {
                     </td>
                   ))}
                 </tr>
-              ))
-            )}
+              )))}
           </tbody>
         </table>
       </div>
@@ -171,7 +170,7 @@ const Rulebook = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-gray-100">
+    <div className="flex min-h-screen bg-gray-900 text-gray-100 relative">
       <div
         style={{ width: `${scrollProgress}%` }}
         className="fixed top-0 left-0 h-1 bg-blue-600 z-50"
@@ -180,10 +179,10 @@ const Rulebook = () => {
       {/* Sidebar */}
       <aside
         id="sidebar"
-        className={`fixed top-0 left-0 w-64 bg-gray-800 p-4 h-full z-50 transition-transform transform ${
+        className={`fixed top-0 left-0 w-64 bg-gray-800 p-4 h-full z-40 transform transition-transform duration-300 ease-in-out shadow-lg ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 lg:sticky lg:top-16 overflow-y-auto`}
-        style={{ maxHeight: "calc(100vh - 4rem)" }}
+        } lg:translate-x-0 lg:sticky lg:top-0 overflow-y-auto`}
+        style={{ height: "100vh" }}
       >
         <h2 className="text-lg font-bold text-gray-300 mb-4">
           Table of Contents
@@ -256,11 +255,13 @@ const Rulebook = () => {
       {/* Sidebar Toggle for Mobile */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 text-gray-100 p-2 rounded-md shadow-md"
+        className={`fixed bottom-4 right-4 z-50 p-3 rounded-full shadow-md transition-transform transform duration-300 ease-in-out bg-blue-600 text-white ${
+          isSidebarOpen ? "rotate-90" : "rotate-0"
+        } lg:hidden`}
         aria-expanded={isSidebarOpen}
         aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
       >
-        {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
       </button>
 
       {/* Main Content */}
