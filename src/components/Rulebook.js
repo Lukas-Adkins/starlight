@@ -53,7 +53,7 @@ const Rulebook = () => {
   const renderContent = () => {
     if (!sectionData) {
       return (
-        <p className="text-lg text-gray-400 italic text-center">
+        <p className="text-lg text-dark-textSecondary italic text-center">
           Section not found.
         </p>
       );
@@ -75,17 +75,17 @@ const Rulebook = () => {
               <div
                 key={idx}
                 id={anchorId}
-                className={`${
+                className={`$${
                   isSoleBox || isTable ? "lg:col-span-2" : ""
-                } space-y-6 p-6 bg-gray-800 rounded-lg shadow-md border border-gray-700`}
+                } space-y-6 p-6 bg-dark-surface rounded-lg shadow-md border border-dark-border`}
               >
                 {sec.heading && (
-                  <h3 className="text-3xl font-extrabold text-gray-100 border-b border-gray-700 pb-3">
+                  <h3 className="text-3xl font-extrabold text-dark-textPrimary border-b border-dark-highlight pb-3">
                     {sec.heading}
                   </h3>
                 )}
                 {sec.content && (
-                  <p className="text-gray-300 leading-relaxed">{sec.content}</p>
+                  <p className="text-dark-textSecondary leading-relaxed">{sec.content}</p>
                 )}
                 {sec.table && renderTable(sec.table)}
               </div>
@@ -97,7 +97,7 @@ const Rulebook = () => {
 
     if (typeof sectionData === "string") {
       return (
-        <p className="text-gray-300 leading-relaxed max-w-4xl mx-auto px-6 py-8 bg-gray-800 rounded-lg shadow-md border border-gray-700">
+        <p className="text-dark-textSecondary leading-relaxed max-w-4xl mx-auto px-6 py-8 bg-dark-surface rounded-lg shadow-md border border-dark-border">
           {sectionData}
         </p>
       );
@@ -110,7 +110,7 @@ const Rulebook = () => {
     }
 
     return (
-      <p className="text-lg text-gray-400 italic text-center">
+      <p className="text-lg text-dark-textSecondary italic text-center">
         Invalid section format.
       </p>
     );
@@ -118,18 +118,18 @@ const Rulebook = () => {
 
   const renderTable = (tableData) => {
     if (!tableData?.columns || !tableData?.rows) {
-      return <p className="text-gray-400 italic">Invalid table data.</p>;
+      return <p className="text-dark-textSecondary italic">Invalid table data.</p>;
     }
 
     return (
-      <div className="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
-        <table className="w-full border-collapse text-gray-300 border border-gray-600">
-          <thead className="sticky top-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
+      <div className="overflow-x-auto bg-dark-background rounded-lg shadow-lg">
+        <table className="w-full border-collapse text-dark-textSecondary border border-dark-border">
+          <thead className="sticky top-0 bg-gradient-to-r from-dark-background via-dark-surface to-dark-background">
             <tr>
               {tableData.columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className="px-4 py-3 text-left font-bold border-b border-gray-600 text-gray-200"
+                  className="px-4 py-3 text-left font-bold border-b border-dark-highlight text-dark-textPrimary"
                 >
                   {col}
                 </th>
@@ -148,13 +148,13 @@ const Rulebook = () => {
                 <tr
                   key={rowIdx}
                   className={`${
-                    rowIdx % 2 === 0 ? "bg-gray-800" : "bg-gray-700"
-                  } hover:bg-gray-600 transition duration-300 ease-in-out`}
+                    rowIdx % 2 === 0 ? "bg-dark-surface" : "bg-dark-highlight"
+                  } hover:bg-dark-surface transition duration-300 ease-in-out`}
                 >
                   {Object.values(row).map((value, colIdx) => (
                     <td
                       key={colIdx}
-                      className={`px-4 py-3 border-b border-gray-600 text-gray-300 break-words ${
+                      className={`px-4 py-3 border-b border-dark-border text-dark-textSecondary break-words ${
                         colIdx === 0 ? "font-bold" : ""
                       }`}
                     >
@@ -170,21 +170,21 @@ const Rulebook = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-gray-100 relative">
+    <div className="flex min-h-screen bg-dark-background text-dark-textPrimary relative">
       <div
         style={{ width: `${scrollProgress}%` }}
-        className="fixed top-0 left-0 h-1 bg-blue-600 z-50"
+        className="fixed top-0 left-0 h-1 bg-dark-primary z-50"
       ></div>
 
       {/* Sidebar */}
       <aside
         id="sidebar"
-        className={`fixed top-0 left-0 w-64 bg-gray-800 p-4 h-full z-40 transform transition-transform duration-300 ease-in-out shadow-lg ${
+        className={`fixed top-0 left-0 w-64 bg-dark-surface p-4 h-full z-40 transform transition-transform duration-300 ease-in-out shadow-lg ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:sticky lg:top-0 overflow-y-auto`}
         style={{ height: "100vh" }}
       >
-        <h2 className="text-lg font-bold text-gray-300 mb-4">
+        <h2 className="text-lg font-bold text-dark-textPrimary mb-4">
           Table of Contents
         </h2>
         <ul className="space-y-2">
@@ -200,8 +200,8 @@ const Rulebook = () => {
                   <summary
                     className={`px-4 py-2 rounded-md cursor-pointer flex justify-between items-center ${
                       isCurrentSection
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-900 hover:bg-gray-700 text-gray-300"
+                        ? "bg-dark-primary text-dark-background"
+                        : "bg-dark-background hover:bg-dark-surface text-dark-textPrimary"
                     }`}
                     onClick={(e) => {
                       if (hasSubsections) {
@@ -234,8 +234,8 @@ const Rulebook = () => {
                               }}
                               className={`block px-4 py-2 rounded-md transition ${
                                 isCurrentSubSection
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-gray-900 hover:bg-gray-700 text-gray-300"
+                                  ? "bg-dark-secondary text-dark-background"
+                                  : "bg-dark-background hover:bg-dark-surface text-dark-textPrimary"
                               }`}
                             >
                               {subSection.heading || `Section ${idx + 1}`}
@@ -255,7 +255,7 @@ const Rulebook = () => {
       {/* Sidebar Toggle for Mobile */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className={`fixed bottom-4 right-4 z-50 p-3 rounded-full shadow-md transition-transform transform duration-300 ease-in-out bg-blue-600 text-white ${
+        className={`fixed bottom-4 right-4 z-50 p-3 rounded-full shadow-md transition-transform transform duration-300 ease-in-out bg-dark-primary text-dark-background ${
           isSidebarOpen ? "rotate-90" : "rotate-0"
         } lg:hidden`}
         aria-expanded={isSidebarOpen}
@@ -266,7 +266,7 @@ const Rulebook = () => {
 
       {/* Main Content */}
       <main className="flex-1 lg:p-8">
-        <div className="bg-gray-800 p-8 shadow-md rounded-lg">
+        <div className="bg-dark-surface p-8 shadow-md rounded-lg">
           <h2 className="text-3xl font-bold mb-6 capitalize text-center">
             {sectionData?.title || "Rulebook"}
           </h2>
