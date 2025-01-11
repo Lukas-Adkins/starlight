@@ -187,7 +187,7 @@ const NavBar = () => {
                     className={`block w-full bg-dark-surface text-left text-lg font-semibold px-4 py-2 rounded-lg border transition hover:bg-dark-highlight ${
                       isActive("/login")
                         ? "text-dark-textPrimary font-bold border-dark-primary"
-                        : "text-dark-textPrimary border-transparent"
+                        : "text-dark-textSecondary border-transparent"
                     }`}
                   >
                     Login

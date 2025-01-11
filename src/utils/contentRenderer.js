@@ -45,16 +45,30 @@ const ContentRenderer = ({ sectionData }) => {
                     rowIdx % 2 === 0 ? "bg-dark-field" : "bg-dark-highlight"
                   }
                 >
-                  {Object.values(row).map((value, colIdx) => (
+                  {tableData.columns.map((col, colIdx) => (
                     <td
                       key={colIdx}
                       className="px-1 sm:px-2 py-1 border-b border-dark-border"
                     >
                       <div
                         className="max-h-[7.5rem] overflow-y-auto break-words"
-                        title={value}
+                        title={
+                          row[col] !== undefined
+                            ? row[col]
+                            : row[col.toLowerCase()] ||
+                              row[col.replace(/\s+/g, "").toLowerCase()] ||
+                              Object.values(row)[colIdx] ||
+                              "Missing"
+                        }
                       >
-                        {value}
+                        {
+                          row[col] !== undefined
+                            ? row[col]
+                            : row[col.toLowerCase()] ||
+                              row[col.replace(/\s+/g, "").toLowerCase()] ||
+                              Object.values(row)[colIdx] ||
+                              "—"
+                        }
                       </div>
                     </td>
                   ))}
@@ -73,11 +87,18 @@ const ContentRenderer = ({ sectionData }) => {
                 rowIdx % 2 === 0 ? "bg-dark-field" : "bg-dark-highlight"
               }`}
             >
-              {tableData.columns.map((col, colIdx) => (
-                <div key={colIdx} className="flex justify-between border-b py-2">
+              {tableData.columns.map((col) => (
+                <div key={col} className="flex justify-between border-b py-2">
                   <span className="font-semibold text-dark-textPrimary">{col}:</span>
                   <span className="text-dark-textSecondary max-w-[70%] break-words">
-                    {row[colIdx] || "—"}
+                    {
+                      row[col] !== undefined
+                        ? row[col]
+                        : row[col.toLowerCase()] ||
+                          row[col.replace(/\s+/g, "").toLowerCase()] ||
+                          Object.values(row)[tableData.columns.indexOf(col)] ||
+                          "—"
+                    }
                   </span>
                 </div>
               ))}

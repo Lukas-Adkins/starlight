@@ -3,8 +3,23 @@ import { RULEBOOK_DATA } from "../constants/rulebookData";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 const Sidebar = ({ section, isSidebarOpen, handleNavigate, toggleSidebar }) => {
+  const handleBackdropClick = (e) => {
+    if (e.target.id === "backdrop") {
+      toggleSidebar();
+    }
+  };
+
   return (
     <>
+      {/* Backdrop for mobile */}
+      {isSidebarOpen && (
+        <div
+          id="backdrop"
+          className="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"
+          onClick={handleBackdropClick}
+        ></div>
+      )}
+
       {/* Sidebar */}
       <aside
         id="sidebar"
