@@ -114,3 +114,13 @@ summary:hover {
   background-color: #2d3748;
 }
 
+/* Remove the default arrow in <details> */
+details {
+  list-style: none; /* Prevents the default list-style */
+}
+
+details > summary {
+  appearance: none; /* Suppress the arrow in modern browsers */
+  -webkit-appearance: none; /* Suppress the arrow for WebKit browsers */
+  -moz-appearance: none; /* Suppress the arrow for Firefox */
+}
