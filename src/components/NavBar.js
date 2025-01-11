@@ -117,9 +117,9 @@ const NavBar = () => {
             ) : (
               <Link
                 to="/login"
-                className={`bg-dark-primary font-bold px-4 py-2 rounded-md hover:bg-dark-primaryHover transition ${
+                className={`bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-primaryHover transition ${
                   isActive("/login")
-                    ? "text-dark-textPrimary font-bold"
+                    ? "text-dark-textPrimary"
                     : "text-dark-textPrimary"
                 }`}
               >

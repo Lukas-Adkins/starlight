@@ -160,8 +160,8 @@ const Login = ({
           onClick={isSignUp ? handleSignUp : handleSignIn}
           className={`w-full px-4 py-2 mt-4 rounded-md ${
             isSignUp
-              ? "bg-dark-primary hover:bg-dark-highlight"
-              : "bg-dark-primary hover:bg-dark-highlight"
+              ? "bg-dark-primary hover:bg-dark-primaryHover"
+              : "bg-dark-primary hover:bg-dark-primaryHover"
           } text-dark-textPrimary focus:outline-none focus:ring-2 focus:ring-dark-primary`}
           disabled={isLocked && !isSignUp} // Only disable if locked and not in sign-up mode
         >
