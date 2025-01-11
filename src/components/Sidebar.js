@@ -30,7 +30,7 @@ const Sidebar = ({ section, isSidebarOpen, handleNavigate, toggleSidebar }) => {
                   className={`px-4 py-2 rounded-md cursor-pointer flex justify-between items-center ${
                     isCurrentSection
                       ? "bg-dark-primary text-dark-textPrimary"
-                      : "bg-dark-background hover:bg-dark-surface text-dark-textPrimary"
+                      : "bg-dark-background hover:bg-dark-primary text-dark-textPrimary"
                   }`}
                   onClick={() => handleNavigate(key)}
                 >
@@ -64,7 +64,7 @@ const Sidebar = ({ section, isSidebarOpen, handleNavigate, toggleSidebar }) => {
                             className={`block px-4 py-2 rounded-md transition ${
                               window.location.hash === `#${anchorId}`
                                 ? "bg-dark-secondary text-dark-background"
-                                : "bg-dark-background hover:bg-dark-surface text-dark-textPrimary"
+                                : "bg-dark-background hover:bg-dark-primary text-dark-textPrimary"
                             }`}
                           >
                             {subSection.heading || `Section ${idx + 1}`}

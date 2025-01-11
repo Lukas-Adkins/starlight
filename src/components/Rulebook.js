@@ -45,10 +45,9 @@ const Rulebook = () => {
         handleNavigate={handleNavigate}
         toggleSidebar={toggleSidebar}
       />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-  <div className="bg-dark-surface p-6 shadow-sm rounded-md">
-
-          <h2 className="text-3xl font-bold mb-6 capitalize text-center">
+      <main className="flex-1 w-full max-w-full px-2 sm:px-4 lg:px-6">
+        <div className="bg-dark-surface px-2 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-8">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 capitalize text-center">
             {sectionData?.title || "Rulebook"}
           </h2>
           <ContentRenderer sectionData={sectionData} />

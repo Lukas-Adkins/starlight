@@ -256,7 +256,7 @@ const Inventory = () => {
       {/* Add Item Button */}
       <button
         onClick={() => dispatchModal({ type: "OPEN_ADD" })}
-        className="fixed bottom-8 right-8 bg-dark-primary px-6 py-3 rounded-full shadow-lg hover:bg-dark-highlight text-dark-textPrimary"
+        className="fixed bottom-8 right-8 bg-dark-primary px-6 py-3 rounded-full shadow-lg hover:bg-dark-primaryHover text-dark-textPrimary"
       >
         + Add Item
       </button>

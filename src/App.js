@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,7 +17,7 @@ import Footer from "./components/Footer";
 import StarlightTable from "./components/StarlightTable";
 import Rulebook from "./components/Rulebook";
 
-import './index.css';
+import "./index.css";
 
 // Initialize React Query's QueryClient
 const queryClient = new QueryClient();
@@ -23,9 +29,10 @@ function App() {
         <Router>
           <div className="min-h-screen flex flex-col bg-dark-background text-dark-textPrimary">
             <NavBar />
-            <main className="flex-grow container mx-auto p-4">
+            <main className="flex-grow w-full max-w-full px-4 lg:container lg:mx-auto mb-6">
               <AnimatedRoutes />
             </main>
+
             <Footer />
           </div>
         </Router>
@@ -68,7 +75,7 @@ function AnimatedRoutes() {
           path="/items"
           element={
             <PageTransition>
-                <StarlightTable />
+              <StarlightTable />
             </PageTransition>
           }
         />
@@ -128,19 +135,25 @@ function PageFastTransition({ children }) {
 }
 
 function Home() {
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-dark-background text-dark-textPrimary">
       <div className="text-center max-w-2xl">
         <h1 className="text-5xl font-bold mb-6">Welcome to Starlight!</h1>
         <p className="text-lg text-dark-textSecondary mb-8">
-          Starlight is your go-to tool for exploring the Starlight setting and game system.
+          Starlight is your go-to tool for exploring the Starlight setting and
+          game system.
         </p>
       </div>
-      <div className="mt-12">
+      <div className="mt-12 flex flex-row gap-4">
+        <a
+          href="/rulebook/character"
+          className="px-6 py-3 bg-dark-primary text-dark-textPrimary text-bold text-lg rounded hover:bg-dark-primaryHover transition-colors"
+        >
+          Explore Rulebook
+        </a>
         <a
           href="/items"
-          className="px-6 py-3 bg-dark-primary text-dark-textPrimary text-lg rounded hover:bg-dark-highlight transition-colors"
+          className="px-6 py-3 bg-dark-primary text-dark-textPrimary text-lg rounded hover:bg-dark-primaryHover transition-colors"
         >
           Explore Items
         </a>
@@ -148,6 +161,7 @@ function Home() {
     </div>
   );
 }
+
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -163,7 +177,12 @@ const ProtectedRoute = ({ children }) => {
 
   // Redirect to login page if not logged in
   if (!user) {
-    return <Navigate to="/login" state={{ message: "Please log in to access this page." }} />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ message: "Please log in to access this page." }}
+      />
+    );
   }
 
   return children;

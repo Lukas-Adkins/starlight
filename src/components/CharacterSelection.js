@@ -201,7 +201,7 @@ const CharacterSelection = () => {
         className={`fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg transition text-dark-textPrimary ${
           characters.length >= MAX_CHARACTERS
             ? "bg-dark-highlight cursor-not-allowed"
-            : "bg-dark-primary hover:bg-dark-highlight"
+            : "bg-dark-primary hover:bg-dark-primaryHover"
         }`}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -257,7 +257,7 @@ const CharacterSelection = () => {
                         ? handleEditCharacter
                         : handleCreateCharacter
                     }
-                    className="bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-highlight transition text-dark-textPrimary"
+                    className="bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-primaryHover transition text-dark-textPrimary"
                   >
                     {editingCharacter ? "Save Changes" : "Create"}
                   </button>
@@ -267,7 +267,7 @@ const CharacterSelection = () => {
                       setEditingCharacter(null);
                       setCharacterImageUrl("");
                     }}
-                    className="bg-dark-highlight px-4 py-2 rounded-md hover:bg-dark-surface transition text-dark-textPrimary"
+                    className="bg-dark-highlight px-4 py-2 rounded-md hover:bg-dark-primaryHover transition text-dark-textPrimary"
                   >
                     Cancel
                   </button>

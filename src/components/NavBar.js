@@ -15,7 +15,10 @@ const NavBar = () => {
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (!event.target.closest(".dropdown-menu") && !event.target.closest(".menu-button")) {
+      if (
+        !event.target.closest(".dropdown-menu") &&
+        !event.target.closest(".menu-button")
+      ) {
         setMenuOpen(false);
       }
     };
@@ -46,11 +49,14 @@ const NavBar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-<header className="bg-dark-background p-2 shadow-md z-50 w-full lg:relative lg:top-auto lg:left-auto">
-<div className="container mx-auto flex justify-between items-center h-auto">
+    <header className="bg-dark-surface p-2 shadow-md z-50 w-full lg:relative lg:top-auto lg:left-auto mb-5">
+      <div className="container mx-auto flex justify-between items-center h-auto">
         {/* Left Side: Home Icon */}
         <div className="flex items-center space-x-4 lg:space-x-6">
-          <Link to="/" className="text-dark-textSecondary hover:text-dark-primary transition">
+          <Link
+            to="/"
+            className="text-dark-textSecondary hover:text-dark-primary transition"
+          >
             <HomeIcon className="h-8 w-8" />
           </Link>
         </div>
@@ -58,11 +64,11 @@ const NavBar = () => {
         {/* Center Section: Links */}
         <nav className="hidden lg:flex lg:items-center lg:space-x-6">
           <Link
-            to="/rulebook/introduction"
+            to="/rulebook/character"
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
               location.pathname.startsWith("/rulebook")
                 ? "bg-dark-primary text-dark-textPrimary shadow-lg"
-                : "text-dark-textSecondary hover:bg-dark-surface"
+                : "text-dark-textSecondary hover:bg-dark-primary"
             }`}
           >
             Rulebook
@@ -73,7 +79,7 @@ const NavBar = () => {
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
               isActive("/items")
                 ? "bg-dark-primary text-dark-textPrimary shadow-lg"
-                : "text-dark-textSecondary hover:bg-dark-surface"
+                : "text-dark-textSecondary hover:bg-dark-primary"
             }`}
           >
             Items
@@ -84,7 +90,7 @@ const NavBar = () => {
             className={`text-lg font-semibold px-4 py-2 rounded-lg transition ${
               isActive("/characters")
                 ? "bg-dark-primary text-dark-textPrimary shadow-lg"
-                : "text-dark-textSecondary hover:bg-dark-surface"
+                : "text-dark-textSecondary hover:bg-dark-primary"
             }`}
           >
             Characters
@@ -111,8 +117,10 @@ const NavBar = () => {
             ) : (
               <Link
                 to="/login"
-                className={`bg-dark-primary px-4 py-2 rounded-md hover:bg-dark-highlight transition ${
-                  isActive("/login") ? "text-dark-textPrimary font-bold" : "text-dark-textPrimary"
+                className={`bg-dark-primary font-bold px-4 py-2 rounded-md hover:bg-dark-primaryHover transition ${
+                  isActive("/login")
+                    ? "text-dark-textPrimary font-bold"
+                    : "text-dark-textPrimary"
                 }`}
               >
                 Login
@@ -130,7 +138,7 @@ const NavBar = () => {
                 className="dropdown-menu absolute top-12 right-0 w-64 bg-dark-surface shadow-lg rounded-lg p-4 z-60 space-y-2"
               >
                 <Link
-                  to="/rulebook/introduction"
+                  to="/rulebook/character"
                   onClick={() => setMenuOpen(false)}
                   className={`block text-left text-lg font-semibold px-4 py-2 rounded-lg border transition ${
                     location.pathname.startsWith("/rulebook")
@@ -177,7 +185,9 @@ const NavBar = () => {
                     to="/login"
                     onClick={() => setMenuOpen(false)}
                     className={`block w-full bg-dark-surface text-left text-lg font-semibold px-4 py-2 rounded-lg border transition hover:bg-dark-highlight ${
-                      isActive("/login") ? "text-dark-textPrimary font-bold border-dark-primary" : "text-dark-textPrimary border-transparent"
+                      isActive("/login")
+                        ? "text-dark-textPrimary font-bold border-dark-primary"
+                        : "text-dark-textPrimary border-transparent"
                     }`}
                   >
                     Login
