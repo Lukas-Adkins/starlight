@@ -163,7 +163,7 @@ const Login = ({
               ? "bg-dark-primary hover:bg-dark-primaryHover"
               : "bg-dark-primary hover:bg-dark-primaryHover"
           } text-dark-textPrimary focus:outline-none focus:ring-2 focus:ring-dark-primary`}
-          disabled={isLocked && !isSignUp} // Only disable if locked and not in sign-up mode
+          disabled={isLocked && !isSignUp}
         >
           {isSignUp
             ? "Create Account"
